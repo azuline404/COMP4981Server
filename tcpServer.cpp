@@ -72,7 +72,6 @@ void * clientThread(void *arg)
 
 	const int test = 1;
     int n;
-
     char buffer[BUFLEN];
 	int bytes_to_read = BUFLEN;
     for(int x = 0; x < 300; x++) {
@@ -134,7 +133,6 @@ int update_json(char* buffer, const Value *p) {
     V(sem_id);
     printf("Semaphore incremented\n");
 }
-
 
 int main (int argc, char **argv)
 {
