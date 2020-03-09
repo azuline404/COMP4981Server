@@ -41,7 +41,7 @@
 
 
 #define SERVER_TCP_PORT		7000	// Default port
-#define BUFLEN			80  	// Buffer length
+#define BUFLEN			2000  	// Buffer length
 
 using namespace rapidjson;
 
@@ -88,11 +88,11 @@ int main (int argc, char **argv)
 	int value = 0;
 	int id;
 	for (int i = 0; i < 4;i++) {
-		value++;
 		id = fork();
 		if (id == 0) {
 			break;
 		}
+		value++;
 	}
 	if (id != 0 ) {
 		exit(1);
@@ -100,7 +100,7 @@ int main (int argc, char **argv)
 
 	Document d;
     d.Parse(json);
-
+   
     // 2. Modify it by DOM.
     Value & players = d["players"];
 
@@ -141,7 +141,7 @@ int main (int argc, char **argv)
 	pptr = hp->h_addr_list;
 	printf("\t\tIP Address: %s\n", inet_ntop(hp->h_addrtype, *pptr, str, sizeof(str)));
 	printf("Transmit:\n");
-	//gets(sbuf); // get user's text
+	//gets(sbubufferf); // get user's text
 
 
 	// Transmit data through the socket
@@ -152,8 +152,6 @@ int main (int argc, char **argv)
 	strcpy(sbuf,buffer.GetString());
 	send (sd, sbuf, BUFLEN, 0);
 
-
-	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
@@ -164,7 +162,7 @@ int main (int argc, char **argv)
 		bp += n;
 		bytes_to_read -= n;
 	}
-	printf ("%s\n", rbuf);
+	printf ("\n\nReceived: %s\n", rbuf);
 	fflush(stdout);
 	close (sd);
 	return (0);

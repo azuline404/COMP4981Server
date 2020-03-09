@@ -17,67 +17,68 @@
 #include "rapidjson/document.h"
 
 #define SERVER_TCP_PORT 7000	// Default port
-#define BUFLEN	80		//Buffer length
+#define BUFLEN	2000		//Buffer length
 #define TRUE	1
 
 using namespace std;
-char * gameObject = "{"
-	"\"players\":["
-	"{"
+
+char* gameObject = "{"
+    "\"players\":["
+        "{"
+                "\"id\":0,"
+                "\"x\":0,"
+                "\"formatname\":\"mp3\","
+                "\"title\":\"Zombie\","
+                "\"bitrate\":160000,"
+                "\"artist\":\"Cranberries\","
+                "\"track_number\":\"01\","
+                "\"codecname\":\"mp3\""
+       " },"
+        "{"
                 "\"id\":1,"
                 "\"x\":0,"
-                "\formatname\":\"mp3\","
+                "\"formatname\":\"mp3\","
                 "\"title\":\"Zombie\","
                 "\"bitrate\":160000,"
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
                 "\"codecname\":\"mp3\""
-   "},"
-   "{"
+       " },"
+        "{"
                 "\"id\":2,"
                 "\"x\":0,"
-                "\formatname\":\"mp3\","
+                "\"formatname\":\"mp3\","
                 "\"title\":\"Zombie\","
                 "\"bitrate\":160000,"
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
                 "\"codecname\":\"mp3\""
-   "},"
-   "{"
+       " },"
+        "{"
                 "\"id\":3,"
                 "\"x\":0,"
-                "\formatname\":\"mp3\","
+                "\"formatname\":\"mp3\","
                 "\"title\":\"Zombie\","
                 "\"bitrate\":160000,"
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
                 "\"codecname\":\"mp3\""
-   "},"
-   "{"
-                "\"id\":4,"
-                "\"x\":0,"
-                "\formatname\":\"mp3\","
-                "\"title\":\"Zombie\","
-                "\"bitrate\":160000,"
-                "\"artist\":\"Cranberries\","
-                "\"track_number\":\"01\","
-                "\"codecname\":\"mp3\""
-   "}"
-    "]"
-"}";
+       " }"
+	"]"
+	"}";
 
 using namespace rapidjson;
 void * clientThread(void *arg)
 {
 	const int test = 1;
     int n;
-    int bp;
     int sd = *((int *)arg);
 	if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &test, sizeof(int)) < 0){
 	}
     char buffer[BUFLEN];
 	int bytes_to_read = BUFLEN;
     n = recv (sd, buffer, bytes_to_read, 0);
+    printf("RECEIVED:\n %s \n\n", buffer);
     if (n < 0) {
         printf("didnt recieve anything, recv error");
         exit(1);
@@ -85,7 +86,9 @@ void * clientThread(void *arg)
 
     Document serverDocument;
     serverDocument.Parse(gameObject);
+    printf("PARSED GAMEOBJECT\n");
     Value & serverPlayers = serverDocument["players"];
+    printf("PARSED players\n");
     char * tempBuf = buffer;
     Document playerDocument;
     playerDocument.Parse(tempBuf);
@@ -106,18 +109,16 @@ void * clientThread(void *arg)
 		send (sd, buffer, BUFLEN, 0);
 	}
 	close (sd);
+    return NULL;
 }
 
 
 
 int main (int argc, char **argv)
 {
-    int socketList[30];
     pthread_t tid[30];
-	int	n, bytes_to_read;
 	int	sd, new_sd, client_len, port;
 	struct	sockaddr_in server, client;
-	char	*bp, buf[BUFLEN];
 
 	switch(argc)
 	{
@@ -158,7 +159,7 @@ int main (int argc, char **argv)
 			fprintf(stderr, "Can't accept client\n");
 			exit(1);
 		}
-        socketList[i] = new_sd;
+        //socketList[i] = new_sd;
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
         if( pthread_create(&tid[i++], NULL, clientThread, &new_sd) != 0 ) {
            printf("Failed to create thread\n");

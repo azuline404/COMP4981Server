@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/COMP4981Server.dir/ConnectionType.cpp.o CMakeFiles/COMP4981Server.dir/ConnectivityManager.cpp.o CMakeFiles/COMP4981Server.dir/messageFunctions.c.o CMakeFiles/COMP4981Server.dir/tcpServer.cpp.o  -o COMP4981Server 
