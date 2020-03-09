@@ -49,7 +49,7 @@ using namespace rapidjson;
 int main (int argc, char **argv)
 {
 	int n, bytes_to_read;
-	int sd, port;
+	int sd, udpSocket, port;
 	struct hostent	*hp;
 	struct sockaddr_in server;
 	char  *host, *bp, rbuf[BUFLEN], sbuf[BUFLEN], **pptr;
@@ -143,6 +143,19 @@ int main (int argc, char **argv)
 	printf("Transmit:\n");
 	//gets(sbubufferf); // get user's text
 
+	//read udp port
+	int nread = read(sd, rbuf, BUFLEN);
+	printf("\n\nRECEIVED PORT NUMBER: %s\n", rbuf);
+	bzero((char *)&server, sizeof(struct sockaddr_in));
+	server.sin_family = AF_INET;
+	server.sin_port = htons(atoi(rbuf));
+	server.sin_addr = *((struct in_addr *)hp->h_addr);
+
+	udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udpSocket == -1) {
+        perror("udpSocket creation");
+        exit(0);
+    }
 
 	// Transmit data through the socket
 
@@ -150,18 +163,16 @@ int main (int argc, char **argv)
     std::cout << buffer.GetString() << std::endl;
 
 	strcpy(sbuf,buffer.GetString());
-	send (sd, sbuf, BUFLEN, 0);
+	sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server));
 
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = 0;
-	while ((n = recv (sd, bp, bytes_to_read, 0)) < BUFLEN)
-	{
-		bp += n;
-		bytes_to_read -= n;
-	}
+	char buf[BUFLEN];
+	recvfrom(udpSocket, buf, sizeof(buf), 0, NULL, NULL);
+
 	printf ("\n\nReceived: %s\n", rbuf);
 	fflush(stdout);
 	close (sd);

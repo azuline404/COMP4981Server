@@ -16,6 +16,8 @@ int ConnectivityManager::getSocket(ConnectionType type) {
         perror ("Can't create a socket"); 
         exit(1);
     }
+    const int i = 1;
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &i, 0);
     return sd;
 }
 
