@@ -152,7 +152,6 @@ int main (int argc, char **argv)
 	strcpy(sbuf,buffer.GetString());
 	send (sd, sbuf, BUFLEN, 0);
 
-
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;

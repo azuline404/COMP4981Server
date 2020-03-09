@@ -73,8 +73,6 @@ void * clientThread(void *arg)
     int n;
     int bp;
     int sd = *((int *)arg);
-	if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &test, sizeof(int)) < 0){
-	}
     char buffer[BUFLEN];
 	int bytes_to_read = BUFLEN;
     n = recv (sd, buffer, bytes_to_read, 0);
@@ -83,31 +81,39 @@ void * clientThread(void *arg)
         exit(1);
     }
 
-    Document serverDocument;
-    serverDocument.Parse(gameObject);
-    Value & serverPlayers = serverDocument["players"];
-    char * tempBuf = buffer;
-    Document playerDocument;
-    playerDocument.Parse(tempBuf);
-    // // 2. Modify it by DOM.
-    Value& players = playerDocument["players"];
-    for (Value::ConstValueIterator itr = players.Begin(); itr != players.End(); itr++) {
-    	const Value& currentPlayer = (*itr);
-		int id = currentPlayer["id"].GetInt();
-		int xCoord = currentPlayer["x"].GetInt();
-		Value & playerObject = serverPlayers[id];
-		playerObject["x"].SetInt(xCoord);
-		StringBuffer buffer2;
-		Writer<StringBuffer> writer(buffer2);
-		serverDocument.Accept(writer);
-		std::cout << buffer2.GetString() << std::endl;
-		strcpy(buffer, buffer2.GetString());
-		printf ("sending:%s\n", buffer);
-		send (sd, buffer, BUFLEN, 0);
-	}
-	close (sd);
-}
+    // Document serverDocument;
+    // serverDocument.Parse(gameObject.str().c_str());
+	// rapidjson::Value::MemberIterator playerIterator = serverDocument.FindMember( "players" );
+	// const rapidjson::Value& serverPlayers = serverDocument[ "players" ];
+    
+	Document playerDocument;
+    playerDocument.Parse(buffer);
+    
+	rapidjson::Value::MemberIterator clientIterator = playerDocument.FindMember( "players" );
+	const rapidjson::Value& clientPlayers = playerDocument[ "players" ];
 
+	for (rapidjson::Value::ConstValueIterator itr = clientPlayers.Begin(); itr != clientPlayers.End(); ++itr) {
+    const rapidjson::Value& player = *itr;
+		for (rapidjson::Value::ConstMemberIterator itr2 = clientPlayers.MemberBegin(); itr2 != clientPlayers.MemberEnd(); ++itr2) {
+			std::cout << itr2->id.GetInt() << " : " << itr2->x.GetInt() << std::endl;
+		}
+	// 	int id = currentPlayer["id"].GetInt();
+	// 	int xCoord = currentPlayer["x"].GetInt();
+	// 	// Value & playerObject = serverPlayers[id];
+	// 	// playerObject["x"].SetInt(xCoord);
+	// 	// StringBuffer buffer2;
+	// 	// Writer<StringBuffer> writer(buffer2);
+	// 	// serverDocument.Accept(writer);
+	// 	// std::cout << buffer2.GetString() << std::endl;
+	// 	// strcpy(buffer, buffer2.GetString());
+	// 	// printf ("sending:%s\n", buffer);
+	
+	// }
+	}
+	memset(buffer, 'a', sizeof(buffer));
+	send (sd, buffer, BUFLEN, 0);
+	// close (sd);
+}
 
 
 int main (int argc, char **argv)
