@@ -74,12 +74,6 @@ int main (int argc, char **argv)
         "{"
                 "\"id\":0,"
                 "\"x\":0,"
-                "\"formatname\":\"mp3\","
-                "\"title\":\"Zombie\","
-                "\"bitrate\":160000,"
-                "\"artist\":\"Cranberries\","
-                "\"track_number\":\"01\","
-                "\"codecname\":\"mp3\""
        " }"
 	"]"
 	"}";
@@ -88,7 +82,9 @@ int main (int argc, char **argv)
 	int value = 0;
 	int id;
 	for (int i = 0; i < 4;i++) {
-		id = fork();
+		if((id = fork()) < 0) {
+			perror("Fork failed");
+		}
 		if (id == 0) {
 			break;
 		}
@@ -97,22 +93,6 @@ int main (int argc, char **argv)
 	if (id != 0 ) {
 		exit(1);
 	} 
-
-	Document d;
-    d.Parse(json);
-   
-    // 2. Modify it by DOM.
-    Value & players = d["players"];
-
-	players[0]["x"].SetInt(value);
-	players[0]["id"].SetInt(value);
-    // 3. Stringify the DOM
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    d.Accept(writer);
-
-
-
 
 	// Create the socket
 	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -157,13 +137,33 @@ int main (int argc, char **argv)
         exit(0);
     }
 
-	// Transmit data through the socket
+	Document d;
+    d.Parse(json);
+   
+    // 2. Modify it by DOM.
+    Value & players = d["players"];
+	int client = value;
+	players[0]["x"].SetInt(value);
+	players[0]["id"].SetInt(value);
+    // 3. Stringify the DOM
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
 
     // Output {"project":"rapidjson","stars":11}
-    std::cout << buffer.GetString() << std::endl;
 
-	strcpy(sbuf,buffer.GetString());
-	sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server));
+	for(int i = 0; i < 300; i++) {
+		players[0]["x"].SetInt(i);
+		StringBuffer wbuffer;
+		Writer<StringBuffer>writer2(wbuffer);
+		d.Accept(writer2);
+		strcpy(sbuf,wbuffer.GetString());
+		printf("SENDING: %s\n", sbuf);
+		sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server));
+		printf("client %d sent: %d\n", client, i);
+		usleep(3000);
+	}
+	
 
 	bp = rbuf;
 	bytes_to_read = BUFLEN;

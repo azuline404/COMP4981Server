@@ -18,10 +18,13 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 
+#include <sys/sem.h>
+#include <semaphore.h>
+
 #define SERVER_TCP_PORT 7000	// Default port
 #define BUFLEN	2000		//Buffer length
 #define PORT 8080
-volatile int UDP_PORT = 5150;
+volatile int UDP_PORT = 12500;
 
 using namespace std;
 
@@ -31,6 +34,13 @@ using namespace rapidjson;
 
 int update_json(char* buffer, const Value *p);
 
+int init_semaphore(int sem_id, key_t key);
+void P(int sem_id);
+void V(int sem_id);
+int remove_semaphore(int sem_id);
+
+int sem_id;
+
 void * clientThread(void *arg)
 {
     char buff[BUFLEN];
@@ -38,7 +48,10 @@ void * clientThread(void *arg)
     struct	sockaddr_in server;
     int udpSock;
     udpSock = ConnectivityManager::getSocket(ConnectionType::UDP);
-
+    const int i = 1;
+    if(setsockopt(udpSock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+        perror("SET SOCK OPT FAILED");
+    };
     // Bind an address to the socket
 	bzero((char *)&server, sizeof(struct sockaddr_in));
 	server.sin_family = AF_INET;
@@ -62,6 +75,7 @@ void * clientThread(void *arg)
 
     char buffer[BUFLEN];
 	int bytes_to_read = BUFLEN;
+    for(int x = 0; x < 300; x++) {
     n = recvfrom (udpSock, buffer, sizeof(buffer), 0, NULL, NULL);
     printf("\n\nRECEIVED:\n %s \n\n", buffer);
     if (n < 0) {
@@ -78,20 +92,19 @@ void * clientThread(void *arg)
     Value& players = playerDocument["players"];
     	const Value& currentPlayer = players[0];
         update_json( buffer,&currentPlayer);
-        printf("Sending to client: %s", buffer);
-		StringBuffer buffer2;
-		Writer<StringBuffer> writer(buffer2);
-		// serverDocument.Accept(writer);
-		strcpy(buffer, buffer2.GetString());
-		printf ("\n\nsending:%s\n", buffer);
-		send (sd, buffer, BUFLEN, 0);
+        printf("\n\nSending to client: %s", buffer);
+		sendto (udpSock, buffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
+    }
 	close (sd);
     close(udpSock);
     return NULL;
 }
 
 int update_json(char* buffer, const Value *p) {
-    FILE* fp = fopen("./gameObject2.json", "r");
+    printf("Start of update JSON\n");
+    P(sem_id);
+    printf("Semaphore decremented\n");
+    FILE* fp = fopen("./gameObject.json", "r");
 
     StringBuffer outputBuffer;
 
@@ -111,15 +124,16 @@ int update_json(char* buffer, const Value *p) {
 	Writer<StringBuffer> writer(outputBuffer);
 	d.Accept(writer);
     fclose(fp);
-    fp = fopen("./gameObject2.json", "w");
+    fp = fopen("./gameObject.json", "w");
     FileWriteStream os(fp, (char*)outputBuffer.GetString(), 65536);
     Writer<FileWriteStream> writer2(os);
     d.Accept(writer2);
     strcpy(buffer, outputBuffer.GetString());
 
     fclose(fp);
+    V(sem_id);
+    printf("Semaphore incremented\n");
 }
-
 
 
 int main (int argc, char **argv)
@@ -140,8 +154,18 @@ int main (int argc, char **argv)
 			fprintf(stderr, "Usage: %s [port]\n", argv[0]);
 			exit(1);
     }
+
+    //Init semaphore
+    if((sem_id = init_semaphore(sem_id, (key_t)200)) == -1) {
+        perror("init_semphore");
+    }
+    V(sem_id);
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
+    const int j = 0;
+    if(setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &j, sizeof(int)) < 0) {
+        perror("SET TCP SOCK OPT FAILED");
+    };
 	// Bind an address to the socket
 	bzero((char *)&server, sizeof(struct sockaddr_in));
 	server.sin_family = AF_INET;
@@ -175,6 +199,54 @@ int main (int argc, char **argv)
         UDP_PORT++;
 	}
 	close(sd);
+    remove_semaphore(sem_id);
 	return(0);
 }
 
+int init_semaphore(int sem_id, key_t key) {
+    int status=0;
+
+    if ((sem_id = semget((key_t)key, 1, 0666|IPC_CREAT|IPC_EXCL)) == -1)
+    {
+        if (errno == EEXIST)
+        sem_id = semget ((key_t)key, 1, 0);
+    }
+    else   /* if created */
+        status = semctl (sem_id, 0, SETVAL, 0);
+    if ((sem_id == -1) || status == -1)
+    {
+        perror ("initsem failed\n");
+        return (-1);
+    }
+    else
+        return (sem_id);
+}
+
+void P(int sem_id) {
+ 
+    struct sembuf *sembuf_ptr;
+        
+    sembuf_ptr= (struct sembuf *) malloc (sizeof (struct sembuf *) );
+    sembuf_ptr->sem_num = 0;
+    sembuf_ptr->sem_op = -1;
+    sembuf_ptr->sem_flg = SEM_UNDO;
+
+    if ((semop(sem_id,sembuf_ptr,1)) == -1)
+	printf("semop error\n");
+}
+
+void V(int sem_id) {
+struct sembuf *sembuf_ptr;
+        
+    sembuf_ptr= (struct sembuf *) malloc (sizeof (struct sembuf *) );
+    sembuf_ptr->sem_num = 0;
+    sembuf_ptr->sem_op = 1;
+    sembuf_ptr->sem_flg = SEM_UNDO;
+
+    if ((semop(sem_id,sembuf_ptr,1)) == -1)
+	printf("semop error\n");
+}
+
+int remove_semaphore(int sem_id) {
+    semctl(sem_id, IPC_RMID, 0);
+}
