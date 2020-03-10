@@ -65,11 +65,15 @@ int main (int argc, char **argv)
 			host =	argv[1];
 			port =	atoi(argv[2]);	// User specified port
 		break;
+		case 4:
+			host =	argv[1];
+			port =	atoi(argv[2]);
+			break;
 		default:
 			fprintf(stderr, "Usage: %s host [port]\n", argv[0]);
 			exit(1);
 	}
-    const char * json = "{"
+    const char * json2 = "{"
     "\"players\":["
         "{"
                 "\"id\":0,"
@@ -79,27 +83,38 @@ int main (int argc, char **argv)
                 "\"bitrate\":160000,"
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
+                "\"codecname\":\"mp3\","
+				"\"formatname\":\"mp3\","
+                "\"title\":\"Zombie\","
+                "\"bitrate\":160000,"
+                "\"artist\":\"Cranberries\","
+                "\"track_number\":\"01\","
                 "\"codecname\":\"mp3\""
        " }"
 	"]"
 	"}";
+
+	const char *json = "   {\"id\":0,\n        \"x\":0, \n        \"formatname\": \"mp3\", \n        \"title\": \"Zombie\",  \n        \"bitrate\": 160000, \n        \"artist\": \"Cranberries\", \n        \"track_number\": 123,\n        \"codecname\": \"mp3\",\n        \"formatname2\": \"mp3\", \n        \"title2\": \"Zombie\",  \n        \"bitrate2\": 160000, \n        \"artist2\": \"Cranberries\", \n        \"track_number2\": 123,\n        \"codecname2\": \"mp3\",\n        \"formatname3\": \"mp3\", \n        \"title3\": \"Zombie\",  \n        \"bitrate3\": 160000, \n        \"artist3\": \"Cranberries\", \n        \"track_number3\": 123,\n        \"codecname3\": \"mp3\"\n     }";
 	
 
-	int value = 0;
+	int value = atoi(argv[3]);
 	int id;
-	for (int i = 0; i < 4;i++) {
-		if((id = fork()) < 0) {
-			perror("Fork failed");
-		}
-		if (id == 0) {
-			break;
-		}
-		value++;
-	}
-	if (id != 0 ) {
-		exit(1);
-	} 
+	//for (int i = 0; i < 6;i++) {
+		// if((id = fork()) < 0) {
+		// 	perror("Fork failed");
+		// }
+		// if (id == 0) {
+		// 	printf("\n Client %d is running now \n", value);
+		// 	break;
+		// }
+		// value++;
+	//}
+	// if (id != 0 ) {
+	// 	printf("parent process exiting \n");
+	// 	exit(1);
+	// } 
 
+	printf("\n client %d out of for loop", value);
 	// Create the socket
 	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -158,14 +173,17 @@ int main (int argc, char **argv)
 
     // Output {"project":"rapidjson","stars":11}
 
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < 300; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);
 		d.Accept(writer2);
 		strcpy(sbuf,wbuffer.GetString());
 		printf("SENDING: %s\n", sbuf);
-		sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server));
+		if(sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
+			printf("client %d:",client);
+			perror("send to\n");
+		}
 		printf("client %d sent: %d\n", client, i);
 		usleep(3000);
 	}
