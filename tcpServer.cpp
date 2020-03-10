@@ -74,27 +74,28 @@ void * clientThread(void *arg)
 	const int test = 1;
     int n;
 	int bytes_to_read = BUFLEN;
-    for (int i = 0; i < 10; i++) {
-    memset(readBuffer, 0, BUFLEN);
-    n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
-    printf("\n\nRECEIVED:\n %s \n\n", readBuffer);
-    if (n < 0) {
-        printf("didnt recieve anything, recv error");
-        exit(1);
-    }
+    int count = 1;
+    while(true) {
+        memset(readBuffer, 0, BUFLEN);
+        n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+        //printf("\n\nRECEIVED:\n %s \n\n", readBuffer);
+        if (n < 0) {
+            printf("didnt recieve anything, recv error");
+            exit(1);
+        }
 
-    // Document serverDocument;
-    // serverDocument.Parse(gameObject);
-    // Value & serverPlayers = serverDocument["players"];
-    char * tempBuf = readBuffer;
-    Document playerDocument;
-    playerDocument.Parse(tempBuf);
-    Value& players = playerDocument["players"];
+        // Document serverDocument;
+        // serverDocument.Parse(gameObject);
+        // Value & serverPlayers = serverDocument["players"];
+        char * tempBuf = readBuffer;
+        Document playerDocument;
+        playerDocument.Parse(tempBuf);
+        Value& players = playerDocument["players"];
     	const Value& currentPlayer = players[0];
         memset(writeBuffer, 0, BUFLEN);
         update_json( writeBuffer,&currentPlayer);
-        printf("\n\nSending to client: %s", writeBuffer);
-		sendto (udpSock, writeBuffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
+        printf("\n\nclient %d: %d", players[0]["id"].GetInt(), count++);
+		//sendto (udpSock, writeBuffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
     }
 	close (sd);
     close(udpSock);
@@ -102,9 +103,7 @@ void * clientThread(void *arg)
 }
 
 int update_json(char* buffer, const Value *p) {
-    printf("Start of update JSON\n");
     P(sem_id);
-    printf("Semaphore decremented\n");
     FILE* fp = fopen("./gameObject.json", "r");
 
     StringBuffer outputBuffer;
@@ -133,7 +132,6 @@ int update_json(char* buffer, const Value *p) {
 
     fclose(fp);
     V(sem_id);
-    printf("Semaphore incremented\n");
 }
 
 int main (int argc, char **argv)

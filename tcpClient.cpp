@@ -65,8 +65,12 @@ int main (int argc, char **argv)
 			host =	argv[1];
 			port =	atoi(argv[2]);	// User specified port
 		break;
+		case 4:
+			host =	argv[1];
+			port =	atoi(argv[2]);
+			break;
 		default:
-			fprintf(stderr, "Usage: %s host [port]\n", argv[0]);
+			fprintf(stderr, "Usage: %s host [port] [id]\n", argv[0]);
 			exit(1);
 	}
     const char * json = "{"
@@ -79,26 +83,79 @@ int main (int argc, char **argv)
                 "\"bitrate\":160000,"
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
-                "\"codecname\":\"mp3\""
+                "\"codecname\":\"mp3\","
+				"\"formatname2\":\"mp3\","
+                "\"title2\":\"Zombie\","
+                "\"bitrate2\":160000,"
+                "\"artist2\":\"Cranberries\","
+                "\"track_number2\":\"01\","
+                "\"codecname2\":\"mp3\","
+				"\"formatname3\":\"mp3\","
+                "\"title3\":\"Zombie\","
+                "\"bitrate3\":160000,"
+                "\"artist3\":\"Cranberries\","
+                "\"track_number3\":\"01\","
+                "\"codecname3\":\"mp3\","
+				"\"formatname4\":\"mp3\","
+                "\"title4\":\"Zombie\","
+                "\"bitrate4\":160000,"
+                "\"artist4\":\"Cranberries\","
+                "\"track_number4\":\"01\","
+                "\"codecname4\":\"mp3\","
+				"\"formatname5\":\"mp3\","
+                "\"title5\":\"Zombie\","
+                "\"bitrate5\":160000,"
+                "\"artist5\":\"Cranberries\","
+                "\"track_number5\":\"01\","
+                "\"codecname5\":\"mp3\","
+				"\"formatname6\":\"mp3\","
+                "\"title6\":\"Zombie\","
+                "\"bitrate6\":160000,"
+                "\"artist6\":\"Cranberries\","
+                "\"track_number6\":\"01\","
+                "\"codecname6\":\"mp3\","
+				"\"formatname7\":\"mp3\","
+                "\"title7\":\"Zombie\","
+                "\"bitrate7\":160000,"
+                "\"artist7\":\"Cranberries\","
+                "\"track_number7\":\"01\","
+                "\"codecname7\":\"mp3\","
+				"\"formatname8\":\"mp3\","
+                "\"title8\":\"Zombie\","
+                "\"bitrate8\":160000,"
+                "\"artist8\":\"Cranberries\","
+                "\"track_number8\":\"01\","
+                "\"codecname8\":\"mp3\","
+				"\"formatname9\":\"mp3\","
+                "\"title9\":\"Zombie\","
+                "\"bitrate9\":160000,"
+                "\"artist9\":\"Cranberries\","
+                "\"track_number9\":\"01\","
+                "\"codecname9\":\"mp3\","
+				"\"formatname10\":\"mp3\","
+                "\"title10\":\"Zombie\","
+                "\"bitrate10\":160000,"
+                "\"artist10\":\"Cranberries\","
+                "\"track_number10\":\"01\","
+                "\"codecname10\":\"mp3\","
+				"\"formatname10\":\"mp3\","
+                "\"title10\":\"Zombie\","
+                "\"bitrate10\":160000,"
+                "\"artist10\":\"Cranberries\","
+                "\"track_number10\":\"01\","
+                "\"codecname10\":\"mp3\","
+				"\"formatname11\":\"mp3\","
+                "\"title11\":\"Zombie\","
+                "\"bitrate11\":160000,"
+                "\"artist11\":\"Cranberries\","
+                "\"track_number11\":\"01\","
+                "\"codecname11\":\"mp3\""
        " }"
 	"]"
 	"}";
-	
 
-	int value = 0;
+	int value = atoi(argv[3]);
 	int id;
-	for (int i = 0; i < 4;i++) {
-		if((id = fork()) < 0) {
-			perror("Fork failed");
-		}
-		if (id == 0) {
-			break;
-		}
-		value++;
-	}
-	if (id != 0 ) {
-		exit(1);
-	} 
 
 	// Create the socket
 	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -130,7 +187,13 @@ int main (int argc, char **argv)
 	//gets(sbubufferf); // get user's text
 
 	//read udp port
-	int nread = read(sd, rbuf, BUFLEN);
+	memset(rbuf, 0, sizeof(rbuf));
+	int nread;
+	if((nread = recv(sd, rbuf, sizeof(rbuf), 0)) < 0) {
+		perror("recv");
+		exit(2);
+	}
+
 	printf("\n\nRECEIVED PORT NUMBER: %s\n", rbuf);
 	bzero((char *)&server, sizeof(struct sockaddr_in));
 	server.sin_family = AF_INET;
@@ -156,27 +219,35 @@ int main (int argc, char **argv)
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-    // Output {"project":"rapidjson","stars":11}
-
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < 1000; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);
 		d.Accept(writer2);
 		strcpy(sbuf,wbuffer.GetString());
 		printf("SENDING: %s\n", sbuf);
-		sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server));
+		if(sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
+			printf("client %d:",client);
+			perror("send to\n");
+		}
 		printf("client %d sent: %d\n", client, i);
-		usleep(3000);
+		usleep(30000);
 	}
 	
+	//clear send buffer, write "stop" to send buffer, send
+	memset(sbuf, 0, BUFLEN);
+	strcpy(sbuf, "stop");
+	printf("sbuf: ", sbuf);
+	if(send(sd, sbuf, BUFLEN, 0) < 0) {
+		perror("send stop");
+	}
 
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
-	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = 0;
 	char buf[BUFLEN];
+	//Wait for server response that will never arrive
 	recvfrom(udpSocket, buf, sizeof(buf), 0, NULL, NULL);
 
 	printf ("\n\nReceived: %s\n", rbuf);
