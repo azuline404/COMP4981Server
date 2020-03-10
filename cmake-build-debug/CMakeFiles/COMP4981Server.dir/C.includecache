@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ellaine/projects/COMP4981Server/messageFunctions.c
+messageFunctions.h
+/home/ellaine/projects/COMP4981Server/messageFunctions.h
+
+/home/ellaine/projects/COMP4981Server/messageFunctions.h
+stdio.h
+-
+sys/types.h
+-
+sys/ipc.h
+-
+sys/msg.h
+-
+

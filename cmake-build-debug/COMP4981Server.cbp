@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="COMP4981Server"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/ellaine/projects/COMP4981Server/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/ellaine/projects/COMP4981Server/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="COMP4981Server">
+				<Option output="/home/ellaine/projects/COMP4981Server/cmake-build-debug/COMP4981Server" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ellaine/projects/COMP4981Server/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/ellaine/projects/COMP4981Server/."/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/error"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/internal"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/msinttypes"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 COMP4981Server"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="COMP4981Server/fast">
+				<Option output="/home/ellaine/projects/COMP4981Server/cmake-build-debug/COMP4981Server" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ellaine/projects/COMP4981Server/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/ellaine/projects/COMP4981Server/."/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/error"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/internal"/>
+					<Add directory="/home/ellaine/projects/COMP4981Server/rapidjson/msinttypes"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 COMP4981Server/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/ellaine/projects/COMP4981Server/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/ellaine/projects/COMP4981Server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/ConnectionType.cpp">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/ConnectivityManager.cpp">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/ConnectivityManager.hpp">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/messageFunctions.c">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/messageFunctions.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/allocators.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/cursorstreamwrapper.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/document.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/encodedstream.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/encodings.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/error/en.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/error/error.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/filereadstream.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/filewritestream.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/fwd.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/biginteger.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/clzll.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/diyfp.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/dtoa.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/ieee754.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/itoa.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/meta.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/pow10.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/regex.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/stack.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/strfunc.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/strtod.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/internal/swap.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/istreamwrapper.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/memorybuffer.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/memorystream.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/msinttypes/inttypes.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/msinttypes/stdint.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/ostreamwrapper.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/pointer.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/prettywriter.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/rapidjson.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/reader.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/schema.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/stream.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/stringbuffer.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/rapidjson/writer.h">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/tcpServer.cpp">
+			<Option target="COMP4981Server"/>
+		</Unit>
+		<Unit filename="/home/ellaine/projects/COMP4981Server/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
