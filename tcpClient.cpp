@@ -245,8 +245,7 @@ int main (int argc, char **argv)
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
-	n = 0;
-	char buf[BUFLEN];
+	n = 0; 1501-1549
 	//Wait for server response that will never arrive
 	recvfrom(udpSocket, buf, sizeof(buf), 0, NULL, NULL);
 

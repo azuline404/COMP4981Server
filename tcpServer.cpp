@@ -2,6 +2,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/epoll.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <strings.h>
@@ -22,15 +23,20 @@
 #include <semaphore.h>
 
 #define SERVER_TCP_PORT 7000	// Default port
+#define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	2000		//Buffer length
 #define PORT 8080
+#define MAX_CLIENTS 2
+#define MAX_EVENTS 2
 volatile int UDP_PORT = 12500;
 
 using namespace std;
-
-
-
 using namespace rapidjson;
+
+struct tStruct {
+    int tcpSocket;
+    int udpSocket;
+};
 
 int update_json(char* buffer, const Value *p);
 
@@ -39,50 +45,51 @@ void P(int sem_id);
 void V(int sem_id);
 int remove_semaphore(int sem_id);
 
+void catch_signal(int sig);
+
 int sem_id;
 
+volatile int start = 0;
 void * clientThread(void *arg)
 {
+    struct tStruct *info = (struct tStruct*) arg;
+    printf("tcp: %d, udp: %d", info->tcpSocket, info->udpSocket);
     char writeBuffer[BUFLEN];
+    char gameObjectBuffer[GAME_OBJECT_BUFFER];
     char readBuffer[BUFLEN];
-    int sd = *((int *)arg);
-    struct	sockaddr_in server;
-    int udpSock;
-    udpSock = ConnectivityManager::getSocket(ConnectionType::UDP);
-    const int i = 1;
-    if(setsockopt(udpSock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
-        perror("SET SOCK OPT FAILED");
-    };
-    // Bind an address to the socket
-	bzero((char *)&server, sizeof(struct sockaddr_in));
-	server.sin_family = AF_INET;
-	server.sin_port = htons(UDP_PORT);
-	server.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
-
-	if (bind(udpSock, (struct sockaddr *)&server, sizeof(server)) == -1)
-	{
-		perror("Can't bind name to socket");
-		exit(1);
-	}
-
+     
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
+    while(start != 1) {
+        //do nothing
+    }
     printf("\n\n SENDING PORT NUMBER: %s\n", writeBuffer);
-    write(sd, writeBuffer, sizeof(writeBuffer));
+
+    write(info->tcpSocket, writeBuffer, sizeof(writeBuffer));
 
 	const int test = 1;
     int n;
+<<<<<<< HEAD
 	int bytes_to_read = BUFLEN;
     int count = 1;
     while(true) {
         memset(readBuffer, 0, BUFLEN);
         n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
         //printf("\n\nRECEIVED:\n %s \n\n", readBuffer);
+=======
+    int count = 1;
+    int client_no = -1;
+    int event_count;
+    while(true) {
+        memset(readBuffer, 0, BUFLEN);
+        n = recvfrom(info->udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+>>>>>>> 077039fd147d92102b411d1a1ca68f226e23d848
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
         }
+<<<<<<< HEAD
 
         // Document serverDocument;
         // serverDocument.Parse(gameObject);
@@ -96,10 +103,22 @@ void * clientThread(void *arg)
         update_json( writeBuffer,&currentPlayer);
         printf("\n\nclient %d: %d", players[0]["id"].GetInt(), count++);
 		//sendto (udpSock, writeBuffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
+=======
+
+        char * tempBuf = readBuffer;
+        Document playerDocument;
+        playerDocument.Parse(tempBuf);
+        Value& players = playerDocument["players"];
+        const Value& currentPlayer = players[0];
+            
+        memset(gameObjectBuffer, 0, BUFLEN);
+        update_json( gameObjectBuffer,&currentPlayer);
+        count++;
+
+>>>>>>> 077039fd147d92102b411d1a1ca68f226e23d848
     }
-	close (sd);
-    close(udpSock);
-    return NULL;
+    fflush(stdout);
+    return (void*)count;
 }
 
 int update_json(char* buffer, const Value *p) {
@@ -136,9 +155,18 @@ int update_json(char* buffer, const Value *p) {
 
 int main (int argc, char **argv)
 {
-    pthread_t tid[30];
+    pthread_t tid[MAX_CLIENTS];
 	int	sd, new_sd, client_len, port;
 	struct	sockaddr_in server, client;
+    struct epoll_event tcpEvent, events[MAX_EVENTS];
+    int epoll_fd;
+    int event_count;
+    int n;
+    int tcpSockets[MAX_CLIENTS];
+    int udpSockets[MAX_CLIENTS];
+    int tCount[MAX_CLIENTS];
+
+    char readBuffer[BUFLEN];
 
 	switch(argc)
 	{
@@ -170,32 +198,104 @@ int main (int argc, char **argv)
 	server.sin_port = htons(port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
 
+                // Bind an address to the socket
+    struct sockaddr_in udpServer;
+    memset(&udpServer, 0, sizeof(udpServer));
+    udpServer.sin_family = AF_INET;
+    udpServer.sin_port = htons(UDP_PORT);
+    udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
+
 	if (bind(sd, (struct sockaddr *)&server, sizeof(server)) == -1)
 	{
 		perror("Can't bind name to socket");
 		exit(1);
 	}
 
-	// Listen for connections
+    if((epoll_fd = epoll_create1(0)) == -1)
+    {
+        fprintf(stderr, "Failed to create epoll file descriptor\n");
+        exit(1);
+    }
+
 
 	// queue up to 5 connect requests
-	listen(sd, 20);
+	listen(sd, 5);
     int i = 0;
+    int numOfClients = 0;
 	while (true)
 	{
+        tStruct t;
+
 		client_len= sizeof(client);
-		if ((new_sd = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
+		if ((tcpSockets[numOfClients] = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
 		{
-			fprintf(stderr, "Can't accept client\n");
+			perror("accept client\n");
 			exit(1);
 		}
-        //socketList[i] = new_sd;
+
+        t.tcpSocket = tcpSockets[numOfClients];
+
+        tcpEvent.events = EPOLLIN;
+        tcpEvent.data.fd = tcpSockets[numOfClients];
+
+        if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, tcpSockets[numOfClients], &tcpEvent))
+        {
+            fprintf(stderr, "Failed to add tcp file descriptor to epoll\n");
+            close(epoll_fd);
+            exit(1);
+        }
+
+        udpSockets[numOfClients] = ConnectivityManager::getSocket(ConnectionType::UDP);
+        const int i = 1;
+        if(setsockopt(udpSockets[numOfClients], SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+            perror("SET SOCK OPT FAILED");
+        };
+
+        if (bind(udpSockets[numOfClients], (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+        {
+            perror("Can't bind name to socket");
+            exit(1);
+        }
+
+        t.udpSocket = udpSockets[numOfClients];
+
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
-        if( pthread_create(&tid[i++], NULL, clientThread, &new_sd) != 0 ) {
+        if( pthread_create(&tid[numOfClients], NULL, clientThread, &t) != 0 ) {
            printf("Failed to create thread\n");
         }
         UDP_PORT++;
+        numOfClients++;
+        if(numOfClients == MAX_CLIENTS) {
+            printf("MAX CLIENT AT: %d", numOfClients);
+            fflush(stdout);
+            start = 1;
+            break;
+        }
 	}
+    while(true) {
+        event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
+
+        for(int i = 0; i < event_count; i++)
+        {
+            //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
+            n = recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
+            if((strcmp(readBuffer, "stop")) == 0) {
+                printf("\n\nclient %d: stop received\n", events[i].data.fd);
+                fflush(stdout);
+                break;
+            }
+                
+        }
+    }
+
+    // for(int z = 0; z < MAX_CLIENTS; z++) {
+    //     pthread_join(tid[z], &tCount[z]);
+    // }
+    for(int x = 0; x < MAX_CLIENTS; x++) {
+        printf("Thread #: %d\t%d", tid[x], tCount[x]);
+        close(tcpSockets[x]);
+        close(udpSockets[x]);
+    }
 	close(sd);
     remove_semaphore(sem_id);
 	return(0);
