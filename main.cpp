@@ -80,23 +80,26 @@ void * clientThread(void *arg)
 		client->setPlayer_name(username);
 		string response = initialResponse(client);
 		std::cout << "Sending back response: " << response.c_str() << endl;
-		send(sd, response.c_str(), sizeof(response), 0);
+		int n = send(sd, response.c_str(), sizeof(response), 0);
+		cout << n << endl;
 	}
 	else {
 		int action = clientRequest["action"].GetInt();
 		if (request == "lobbyRequest") {	
 			switch(action) {
 				case CREATE:
-					// lobbymanager.createLobby();
+					lobbyManager->createLobby(client);
+					// respond with lobby object
 					break;
 				case DESTROY:
-					// lobbymanager.deleteLobby(id);
+					// string lobbyToDelete = clientRequest["lobbyId"].GetString();
+					// change the clients lobby to 0;
 					break;
 				case GET_ALL:
 					//lobbymanager.getLobbyList();
 					break;
 				case JOIN:
-					//lobbymanager.getLobby(id).add(client);
+
 					break;
 				case LEAVE:
 					//lobbymanager.getLobby(id).remove(client);
@@ -104,13 +107,12 @@ void * clientThread(void *arg)
 			}
 		}
 		else if (request == "switchUserSide") {
-
 		}
 		else if (request == "switchStatusReady") {
 
 		}
 		else if (request == "switchPlayerClass") {
-			
+
 		}
 	}
 	close (sd);

@@ -9,8 +9,20 @@ string LobbyManager::getLobbyList() {
     }
     return lobbyListJSON;
 }
-void LobbyManager::createLobby(int owner) {
-    Lobby * lobby = new Lobby(owner);
+
+void LobbyManager::deleteLobby(int lobbyId) {
+    
+    for (auto it = lobbyList.begin(); it != lobbyList.end(); it++) {
+        if ((*it)->getId() == lobbyId) {
+            lobbyList.erase(it);
+            break;
+        }
+    }
+}
+void LobbyManager::createLobby(Client * client) {
+    int id = client->getPlayer_Id();
+    Lobby * lobby = new Lobby(id);
+    client->setLobby_Id(lobby->getId());
     lobbyList.push_back(lobby);
 }
 

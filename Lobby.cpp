@@ -26,15 +26,9 @@ void Lobby::setStatus(string status)
 }
 
 
-std::vector<Client> Lobby::getClientList()
+std::vector<Client*> Lobby::getClientList()
 {
     return this->clientList;
-}
-
-
-void Lobby::setClientList(std::vector<Client> clientList)
-{
-    this->clientList = clientList;
 }
 
 
@@ -56,4 +50,8 @@ int Lobby::getId()
 void Lobby::setId(int id)
 {
     this->id = id;
+}
+
+void Lobby::addClient(Client * client) {
+    clientList.push_back(client);
 }

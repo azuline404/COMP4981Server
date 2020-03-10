@@ -2,7 +2,7 @@
 
 int Client::playerID = 0;
 Client::Client(string characterClass, int team, int socket, int UDPPort, int IP){
-    this->playerID = playerID++;
+    this->player_id = playerID++;
     this->characterClass = characterClass;
     this->status = false;
     this->team = team;
