@@ -1,6 +1,5 @@
 #include "LobbyManager.hpp"
 
-
 string LobbyManager::getLobbyList() {
     string lobbyListJSON = "";
     for (auto it = lobbyList.begin(); it != lobbyList.end(); it++) {
@@ -10,20 +9,20 @@ string LobbyManager::getLobbyList() {
     }
     return lobbyListJSON;
 }
-int LobbyManager::createLobby(int owner) {
-    Lobby lobby = new Lobby(owner);
-    lobbyList.push(lobby);
+void LobbyManager::createLobby(int owner) {
+    Lobby * lobby = new Lobby(owner);
+    lobbyList.push_back(lobby);
 }
 
-Lobby LobbyManager::getLobby(int id) {
+string LobbyManager::getLobby(int id) {
     for (auto it = lobbyList.begin(); it != lobbyList.end(); it++) {
-        if (it->getID() == id) {
-            // TO-DO:
-            // Convert lobby into string
-            // return it 
-            string lobbyJSON = "";
-            return lobbyJSON;
-        }
+        // if (it->getID() == id) {
+        //     // TO-DO:
+        //     // Convert lobby into string
+        //     // return it 
+        //     string lobbyJSON = "";
+        //     return lobbyJSON;
+        // }
     }
     return NULL;
 }

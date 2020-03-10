@@ -1,11 +1,12 @@
 #include "Lobby.hpp"
-#include "Client.hpp"
 
+using namespace std;
 class LobbyManager {
     public:
-        int createLobby(int owner);
+        LobbyManager() = default;
+        void createLobby(int owner);
         string getLobby(int id);
         string getLobbyList();
     private:
-        std::vector<Lobby>LobbyList;
+        std::vector<Lobby*>lobbyList;
 };
