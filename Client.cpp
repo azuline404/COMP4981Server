@@ -10,6 +10,12 @@ Client::Client(string characterClass, int team, int socket, int UDPPort, int IP)
     this->UDPPort = UDPPort;
     this->IP = IP;
 }
+void Client::setLobby_Id(int lobbyID) {
+    this->lobby_id = lobbyID;
+}
+int Client::getLobby_Id() {
+    return this->lobby_id;
+}
 
 int Client::getUDPPort() {
     return this->UDPPort;

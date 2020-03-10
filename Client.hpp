@@ -17,6 +17,8 @@ class Client {
         int getTCPSocket();
         void setTeam(int team);
         int getUDPPort();
+        void setLobby_Id(int lobbyID);
+        int getLobby_Id();
         
     private:
         string player_name;
@@ -27,4 +29,5 @@ class Client {
         int TCPSocket;
         int UDPPort;
         int IP;
+        int lobby_id;
 };

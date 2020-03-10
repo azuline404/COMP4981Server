@@ -88,24 +88,19 @@ int main (int argc, char **argv)
 	printf("Connected:    Server Name: %s\n", hp->h_name);
 	pptr = hp->h_addr_list;
 	printf("\t\tIP Address: %s\n", inet_ntop(hp->h_addrtype, *pptr, str, sizeof(str)));
-	printf("Transmit:\n");
 	//gets(sbuf); // get user's text
-	fgets (sbuf, BUFLEN, stdin);
+	const char * newBuf = "{\"messageType\":\"connect\",\"username\": \"tommychang\"}";
 
 	// Transmit data through the socket
-	send (sd, sbuf, BUFLEN, 0);
+	send (sd, newBuf, BUFLEN, 0);
 
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
 	// client makes repeated calls to recv until no more data is expected to arrive.
-	n = 0;
-	while ((n = recv (sd, bp, bytes_to_read, 0)) < BUFLEN)
-	{
-		bp += n;
-		bytes_to_read -= n;
-	}
+	n = recv (sd, bp, bytes_to_read, 0);
+	
 	printf ("%s\n", rbuf);
 	fflush(stdout);
 	close (sd);

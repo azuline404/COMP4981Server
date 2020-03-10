@@ -25,25 +25,30 @@ using namespace rapidjson;
 #define BUFLEN 8096
 #define SERVER_TCP_PORT 7000
 
+#define  CREATE 0
+#define  DESTROY 1
+#define  GET_ALL 2
+#define  JOIN 3
+#define  LEAVE 4
+
 
 volatile int UDP_PORT = 12500;
 LobbyManager * lobbyManager = new LobbyManager();
 Client * clientList[20];
 
 string initialResponse(Client *client) {
-	const char * json = "{userID:,UDPPort:}";
-	Document document;
-	document.Parse(json);
-	Value & id = document["userID"];
-	Value & port = document["UDPPort"];
+	const char * json = "{\"userID\":0,\"UDPPort\":0}";
+	Document ClientInfo;
+	ClientInfo.Parse(json);
+	Value & id = ClientInfo["userID"];
+	Value & port = ClientInfo["UDPPort"];
 	id.SetInt(client->getPlayer_Id());
 	port.SetInt(client->getUDPPort());
 	StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    document.Accept(writer);
-
+    ClientInfo.Accept(writer);
+	std::cout << "Generated response: " << buffer.GetString() << std::endl;
 	return buffer.GetString();
-
 }
 
 
@@ -63,25 +68,51 @@ void * clientThread(void *arg)
         printf("didnt recieve anything, recv error");
         exit(1);
     }
-	string response = initialResponse(client);
-	const char * jsonResponse = response.c_str();
-	n = send(sd, jsonResponse, sizeof(jsonResponse), 0);
-	// Document clientRequest;
-	// clientRequest.Parse(buffer);
-	// assert(clientRequest.HasMember("messageType"));
-	// string request = clientRequest["messageType"].GetString();
-	// int action = clientRequest["action"].GetInt();
-	// switch(request) {
-	// 	case "lobbyRequest":
-	// 		switch (action) {
-	// 		}
-	// 		break;
-	// 	case "switchStatusReady":
-		
-	// 		break;
-	// 	case "switchPlayerClass":
-	// 		break;
-	// }
+	const char * clientBuff = buffer;
+	printf("Received: %s\n", clientBuff);
+	Document clientRequest;
+	clientRequest.Parse(clientBuff);
+	assert(clientRequest.HasMember("messageType"));
+	string request = clientRequest["messageType"].GetString();
+
+	if (request == "connect") {
+		string username = clientRequest["username"].GetString();
+		client->setPlayer_name(username);
+		string response = initialResponse(client);
+		std::cout << "Sending back response: " << response.c_str() << endl;
+		send(sd, response.c_str(), sizeof(response), 0);
+	}
+	else {
+		int action = clientRequest["action"].GetInt();
+		if (request == "lobbyRequest") {	
+			switch(action) {
+				case CREATE:
+					// lobbymanager.createLobby();
+					break;
+				case DESTROY:
+					// lobbymanager.deleteLobby(id);
+					break;
+				case GET_ALL:
+					//lobbymanager.getLobbyList();
+					break;
+				case JOIN:
+					//lobbymanager.getLobby(id).add(client);
+					break;
+				case LEAVE:
+					//lobbymanager.getLobby(id).remove(client);
+				break;
+			}
+		}
+		else if (request == "switchUserSide") {
+
+		}
+		else if (request == "switchStatusReady") {
+
+		}
+		else if (request == "switchPlayerClass") {
+			
+		}
+	}
 	close (sd);
     return NULL;
 }
