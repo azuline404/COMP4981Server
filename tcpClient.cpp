@@ -74,6 +74,12 @@ int main (int argc, char **argv)
         "{"
                 "\"id\":0,"
                 "\"x\":0,"
+                "\"formatname\":\"mp3\","
+                "\"title\":\"Zombie\","
+                "\"bitrate\":160000,"
+                "\"artist\":\"Cranberries\","
+                "\"track_number\":\"01\","
+                "\"codecname\":\"mp3\""
        " }"
 	"]"
 	"}";
@@ -152,7 +158,7 @@ int main (int argc, char **argv)
 
     // Output {"project":"rapidjson","stars":11}
 
-	for(int i = 0; i < 300; i++) {
+	for(int i = 0; i < 10; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);

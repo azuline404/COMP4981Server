@@ -43,7 +43,8 @@ int sem_id;
 
 void * clientThread(void *arg)
 {
-    char buff[BUFLEN];
+    char writeBuffer[BUFLEN];
+    char readBuffer[BUFLEN];
     int sd = *((int *)arg);
     struct	sockaddr_in server;
     int udpSock;
@@ -65,18 +66,18 @@ void * clientThread(void *arg)
 	}
 
     //send udp port to client
-    memset(buff, 0, sizeof(buff));
-    strcpy(buff, std::to_string(UDP_PORT).c_str());
-    printf("\n\n SENDING PORT NUMBER: %s\n", buff);
-    write(sd, buff, sizeof(buff));
+    memset(writeBuffer, 0, sizeof(writeBuffer));
+    strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
+    printf("\n\n SENDING PORT NUMBER: %s\n", writeBuffer);
+    write(sd, writeBuffer, sizeof(writeBuffer));
 
 	const int test = 1;
     int n;
-    char buffer[BUFLEN];
 	int bytes_to_read = BUFLEN;
-    for(int x = 0; x < 300; x++) {
-    n = recvfrom (udpSock, buffer, sizeof(buffer), 0, NULL, NULL);
-    printf("\n\nRECEIVED:\n %s \n\n", buffer);
+    for (int i = 0; i < 10; i++) {
+    memset(readBuffer, 0, BUFLEN);
+    n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+    printf("\n\nRECEIVED:\n %s \n\n", readBuffer);
     if (n < 0) {
         printf("didnt recieve anything, recv error");
         exit(1);
@@ -85,14 +86,15 @@ void * clientThread(void *arg)
     // Document serverDocument;
     // serverDocument.Parse(gameObject);
     // Value & serverPlayers = serverDocument["players"];
-    char * tempBuf = buffer;
+    char * tempBuf = readBuffer;
     Document playerDocument;
     playerDocument.Parse(tempBuf);
     Value& players = playerDocument["players"];
     	const Value& currentPlayer = players[0];
-        update_json( buffer,&currentPlayer);
-        printf("\n\nSending to client: %s", buffer);
-		sendto (udpSock, buffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
+        memset(writeBuffer, 0, BUFLEN);
+        update_json( writeBuffer,&currentPlayer);
+        printf("\n\nSending to client: %s", writeBuffer);
+		sendto (udpSock, writeBuffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
     }
 	close (sd);
     close(udpSock);
