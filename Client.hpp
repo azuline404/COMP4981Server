@@ -1,4 +1,3 @@
-#include <vector>
 #include <string>
 
 using namespace std;
@@ -8,8 +7,8 @@ class Client {
         Client(string characterClass, int team, int socket, int UDPPort, int IP);
         string getPlayer_name();
         void setPlayer_name(string player_name);
-        int getPlayer_id();
-        void setPlayer_id(int player_id);
+        int getPlayer_Id();
+        void setPlayer_Id(int player_id);
         string getStatus();
         void setStatus(string status);
         string getCharacterClass();
@@ -17,6 +16,8 @@ class Client {
         int getTeam();
         int getTCPSocket();
         void setTeam(int team);
+        int getUDPPort();
+        
     private:
         string player_name;
         int player_id;

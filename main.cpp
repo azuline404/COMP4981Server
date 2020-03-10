@@ -11,22 +11,40 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "ConnectivityManager.hpp"
-// #include "rapidjson/filewritestream.h"
-// #include "rapidjson/filereadstream.h"
-// #include "rapidjson/document.h"
-// #include "rapidjson/writer.h"
-// #include "rapidjson/stringbuffer.h"
-// #include "rapidjson/reader.h"
-// #include "rapidjson/document.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/document.h"
 
 
 using namespace std;
+using namespace rapidjson;
 #define BUFLEN 8096
 #define SERVER_TCP_PORT 7000
 
 
 volatile int UDP_PORT = 12500;
 LobbyManager * lobbyManager = new LobbyManager();
+Client * clientList[20];
+
+string initialResponse(Client *client) {
+	const char * json = "{userID:,UDPPort:}";
+	Document document;
+	document.Parse(json);
+	Value & id = document["userID"];
+	Value & port = document["UDPPort"];
+	id.SetInt(client->getPlayer_Id());
+	port.SetInt(client->getUDPPort());
+	StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    document.Accept(writer);
+
+	return buffer.GetString();
+
+}
 
 
 void * clientThread(void *arg)
@@ -45,7 +63,9 @@ void * clientThread(void *arg)
         printf("didnt recieve anything, recv error");
         exit(1);
     }
-	std::cout << buffer;
+	string response = initialResponse(client);
+	const char * jsonResponse = response.c_str();
+	n = send(sd, jsonResponse, sizeof(jsonResponse), 0);
 	// Document clientRequest;
 	// clientRequest.Parse(buffer);
 	// assert(clientRequest.HasMember("messageType"));
@@ -54,8 +74,6 @@ void * clientThread(void *arg)
 	// switch(request) {
 	// 	case "lobbyRequest":
 	// 		switch (action) {
-
-
 	// 		}
 	// 		break;
 	// 	case "switchStatusReady":
@@ -110,6 +128,7 @@ int main (int argc, char **argv)
 	// queue up to 5 connect requests
 	listen(sd, 20);
     int i = 0;
+	int numClients = 0;
 	while (true)
 	{
 		client_len= sizeof(client);
@@ -120,6 +139,7 @@ int main (int argc, char **argv)
 		}
 		UDP_PORT++;
 		Client * newClient = new Client("default", 0, new_sd, UDP_PORT, atoi(inet_ntoa(client.sin_addr)));
+		clientList[numClients] = newClient;
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
         if( pthread_create(&tid[i++], NULL, clientThread, newClient) != 0 ) {
            printf("Failed to create thread\n");
@@ -127,5 +147,8 @@ int main (int argc, char **argv)
 	}
 	close(sd);
 	delete(lobbyManager);
+	for (int i = 0; i < numClients; i++) {
+		delete(clientList[i]);
+	}
 	return(0);
 }

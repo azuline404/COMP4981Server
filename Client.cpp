@@ -11,6 +11,10 @@ Client::Client(string characterClass, int team, int socket, int UDPPort, int IP)
     this->IP = IP;
 }
 
+int Client::getUDPPort() {
+    return this->UDPPort;
+}
+
 int Client::getTCPSocket() {
     return this->TCPSocket;
 }
@@ -25,12 +29,12 @@ void Client::setPlayer_name(string player_name)
 }
 
 
-int Client::getPlayer_id()
+int Client::getPlayer_Id()
 {
     return this->player_id;
 }
 
-void Client::setPlayer_id(int player_id)
+void Client::setPlayer_Id(int player_id)
 {
     this->player_id = player_id;
 }
