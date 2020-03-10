@@ -2,58 +2,58 @@
 
 int Lobby::lobbyID = 0;
 
-Lobby:Lobby(int lobbyOwner) {
-    this.id = lobbyID++;
-    this.lobbyOwner = lobbyOwner;
-    this.currentPlayers++;
-    this.status = "inactive";
+Lobby::Lobby(int lobbyOwner) {
+    this->id = lobbyID++;
+    this->lobbyOwner = lobbyOwner;
+    this->currentPlayers++;
+    this->status = "inactive";
 }
 
 int Lobby::getCurrentPlayers() 
 {
-    return this.currentPlayers;
+    return this->currentPlayers;
 }
 
 string Lobby::getStatus()
 {
-    return this.status;
+    return this->status;
 }
 
 
 void Lobby::setStatus(string status)
 {
-    this.status = status;
+    this->status = status;
 }
 
 
 std::vector<Client> Lobby::getClientList()
 {
-    return this.clientList;
+    return this->clientList;
 }
 
 
 void Lobby::setClientList(std::vector<Client> clientList)
 {
-    this.clientList = clientList;
+    this->clientList = clientList;
 }
 
 
 int Lobby::getLobbyOwner()
 {
-    return this.lobbyOwner;
+    return this->lobbyOwner;
 }
 
 void Lobby::setLobbyOwner(int lobbyOwner)
 {
-    this.lobbyOwner = lobbyOwner;
+    this->lobbyOwner = lobbyOwner;
 }
 
 int Lobby::getId()
 {
-    return this.id;
+    return this->id;
 }
 
 void Lobby::setId(int id)
 {
-    this.id = id;
+    this->id = id;
 }

@@ -1,8 +1,10 @@
 #include "Client.hpp"
+#include <vector>
 
+using namespace std;
 class Lobby {
     public:
-        Lobby();
+        Lobby(int lobbyOwner);
         static int lobbyID;
         string getLobbyInfo();
         int getCurrentPlayers();
@@ -12,6 +14,8 @@ class Lobby {
         void setClientList(std::vector<Client> clientList);
         int getLobbyOwner();
         void setLobbyOwner(int lobbyOwner);
+        int getId();
+        void setId(int id);
 
     private:
         int id;
@@ -19,4 +23,4 @@ class Lobby {
         string status;
         std::vector<Client> clientList;
         int lobbyOwner;
-}
+};
