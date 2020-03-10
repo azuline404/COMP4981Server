@@ -6,6 +6,7 @@ Lobby::Lobby(int lobbyOwner) {
     this->id = lobbyID++;
     this->lobbyOwner = lobbyOwner;
     this->status = "inactive";
+    //fsdf
 }
 
 int Lobby::getCurrentPlayers() 
