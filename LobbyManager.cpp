@@ -14,6 +14,11 @@ void LobbyManager::deleteLobby(int lobbyId) {
     
     for (auto it = lobbyList.begin(); it != lobbyList.end(); it++) {
         if ((*it)->getId() == lobbyId) {
+            int numPlayers = (*it)->getCurrentPlayers;
+            vector<Client*> list = (*it)->getClientList();
+            for (int i = 0; i < numPlayers; i++) {
+                list[i]->setLobby_Id(0);
+            }
             lobbyList.erase(it);
             break;
         }
@@ -37,4 +42,8 @@ string LobbyManager::getLobby(int id) {
         // }
     }
     return NULL;
+}
+
+Lobby* LobbyManager::getLobbyObject(int id) {
+    return lobbyList[id];
 }

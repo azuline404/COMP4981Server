@@ -24,7 +24,6 @@ using namespace std;
 using namespace rapidjson;
 #define BUFLEN 8096
 #define SERVER_TCP_PORT 7000
-
 #define  CREATE 0
 #define  DESTROY 1
 #define  GET_ALL 2
@@ -85,6 +84,7 @@ void * clientThread(void *arg)
 	}
 	else {
 		int action = clientRequest["action"].GetInt();
+		int lobbyID;
 		if (request == "lobbyRequest") {	
 			switch(action) {
 				case CREATE:
@@ -99,11 +99,18 @@ void * clientThread(void *arg)
 					//lobbymanager.getLobbyList();
 					break;
 				case JOIN:
-
+					{
+						lobbyID = clientRequest["lobbyId"].GetInt();
+						Lobby * lobby = lobbyManager->getLobbyObject(lobbyID);
+						lobby->addClient(client);
+						client->setLobby_Id(lobbyID);
+					}
 					break;
+					// respond with lobby object
 				case LEAVE:
 					//lobbymanager.getLobby(id).remove(client);
-				break;
+					// respond with code 200
+					break;
 			}
 		}
 		else if (request == "switchUserSide") {

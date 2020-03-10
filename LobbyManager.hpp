@@ -8,6 +8,7 @@ class LobbyManager {
         string getLobby(int id);
         string getLobbyList();
         void deleteLobby(int lobbyId);
+        Lobby * getLobbyObject(int id);
     private:
         std::vector<Lobby*>lobbyList;
 };
