@@ -24,10 +24,11 @@
 
 #define SERVER_TCP_PORT 7000	// Default port
 #define GAME_OBJECT_BUFFER 65000
-#define BUFLEN	2000		//Buffer length
+#define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 2
+#define MAX_CLIENTS 16  
 #define MAX_EVENTS 2
+#define PORT_START 12500
 volatile int UDP_PORT = 12500;
 
 using namespace std;
@@ -36,6 +37,7 @@ using namespace rapidjson;
 struct tStruct {
     int tcpSocket;
     int udpSocket;
+    int clientNo;
 };
 
 int update_json(char* buffer, const Value *p);
@@ -50,38 +52,60 @@ void catch_signal(int sig);
 int sem_id;
 
 volatile int start = 0;
-void * clientThread(void *arg)
+
+int tCount[MAX_CLIENTS] = {0};
+
+void * clientThread(void *t_info)
 {
-    struct tStruct *info = (struct tStruct*) arg;
-    printf("tcp: %d, udp: %d", info->tcpSocket, info->udpSocket);
+    int *index = (int*) t_info;
+    int in = *index;
+
+    printf("in: %d", in);
+
+    int udpSocket;
     char writeBuffer[BUFLEN];
     char gameObjectBuffer[GAME_OBJECT_BUFFER];
     char readBuffer[BUFLEN];
-     
+    struct sockaddr_in udpServer;
+    memset(&udpServer, 0, sizeof(udpServer));
+    udpServer.sin_family = AF_INET;
+    udpServer.sin_port = htons(UDP_PORT);
+    udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    while(start != 1) {
-        //do nothing
+    udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    const int i = 1;
+    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+        perror("SET SOCK OPT FAILED");
+    };
+    if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+    {
+        perror("Can't bind name to socket");
+        exit(1);
     }
-    printf("\n\n SENDING PORT NUMBER: %s\n", writeBuffer);
 
-    write(info->tcpSocket, writeBuffer, sizeof(writeBuffer));
-
-	const int test = 1;
+//	const int test = 1;
     int n;
-    int count = 1;
-    int client_no = -1;
-    int event_count;
+//    int count = 1;
+//    int client_no = -1;
+//    int event_count;
+
+    printf("starting client %d \n", in);
     while(true) {
+
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(info->udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
         }
 
         char * tempBuf = readBuffer;
+        
+        // printf("readBuffer for client %d: %s\n", in, readBuffer);
+        fflush(stdout);
+
         Document playerDocument;
         playerDocument.Parse(tempBuf);
         Value& players = playerDocument["players"];
@@ -89,11 +113,11 @@ void * clientThread(void *arg)
             
         memset(gameObjectBuffer, 0, BUFLEN);
         update_json( gameObjectBuffer,&currentPlayer);
-        count++;
-
+        tCount[in]++;
+        //printf("tCount[in]: %d\tin:%d\n", tCount[in], in);
     }
     fflush(stdout);
-    return (void*)count;
+    return NULL;
 }
 
 int update_json(char* buffer, const Value *p) {
@@ -130,7 +154,6 @@ int update_json(char* buffer, const Value *p) {
 
 int main (int argc, char **argv)
 {
-    pthread_t tid[MAX_CLIENTS];
 	int	sd, new_sd, client_len, port;
 	struct	sockaddr_in server, client;
     struct epoll_event tcpEvent, events[MAX_EVENTS];
@@ -138,10 +161,17 @@ int main (int argc, char **argv)
     int event_count;
     int n;
     int tcpSockets[MAX_CLIENTS];
-    int udpSockets[MAX_CLIENTS];
-    int tCount[MAX_CLIENTS];
 
+    pthread_t tid[MAX_CLIENTS];
+    tStruct* infoArray[MAX_CLIENTS];
     char readBuffer[BUFLEN];
+    char writeBuffer[BUFLEN];
+
+    memset(tCount, 0, (MAX_CLIENTS * sizeof(int)));
+    //initialize infoArray
+    for(int i = 0; i < MAX_CLIENTS; i++) {
+        infoArray[i] = new tStruct;
+    }
 
 	switch(argc)
 	{
@@ -173,13 +203,6 @@ int main (int argc, char **argv)
 	server.sin_port = htons(port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
 
-                // Bind an address to the socket
-    struct sockaddr_in udpServer;
-    memset(&udpServer, 0, sizeof(udpServer));
-    udpServer.sin_family = AF_INET;
-    udpServer.sin_port = htons(UDP_PORT);
-    udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
-
 	if (bind(sd, (struct sockaddr *)&server, sizeof(server)) == -1)
 	{
 		perror("Can't bind name to socket");
@@ -199,17 +222,13 @@ int main (int argc, char **argv)
     int numOfClients = 0;
 	while (true)
 	{
-        tStruct t;
-
 		client_len= sizeof(client);
 		if ((tcpSockets[numOfClients] = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
 		{
 			perror("accept client\n");
 			exit(1);
-		}
-
-        t.tcpSocket = tcpSockets[numOfClients];
-
+        }
+        printf("tcp socket created for client %d: %d\n", numOfClients, tcpSockets[numOfClients]);
         tcpEvent.events = EPOLLIN;
         tcpEvent.data.fd = tcpSockets[numOfClients];
 
@@ -219,34 +238,37 @@ int main (int argc, char **argv)
             close(epoll_fd);
             exit(1);
         }
-
-        udpSockets[numOfClients] = ConnectivityManager::getSocket(ConnectionType::UDP);
-        const int i = 1;
-        if(setsockopt(udpSockets[numOfClients], SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
-            perror("SET SOCK OPT FAILED");
-        };
-
-        if (bind(udpSockets[numOfClients], (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
-        {
-            perror("Can't bind name to socket");
-            exit(1);
-        }
-
-        t.udpSocket = udpSockets[numOfClients];
+        
+        infoArray[numOfClients]->tcpSocket = tcpSockets[numOfClients];
+        //infoArray[numOfClients]->tcpSocket = udpSockets[numOfClients];
+        infoArray[numOfClients]->clientNo = numOfClients;
+        //send udpport to client
+        int client_number = numOfClients;
+        printf("Client number: %d" , client_number);
 
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
-        if( pthread_create(&tid[numOfClients], NULL, clientThread, &t) != 0 ) {
+        if( pthread_create(&tid[numOfClients], NULL, clientThread, &client_number) != 0 ) {
            printf("Failed to create thread\n");
         }
         UDP_PORT++;
         numOfClients++;
         if(numOfClients == MAX_CLIENTS) {
-            printf("MAX CLIENT AT: %d", numOfClients);
+            printf("MAX CLIENT AT: %d\n", numOfClients);
             fflush(stdout);
-            start = 1;
+            //signal all clients to start sending
+            for(int i = 0; i < numOfClients; i++) {
+                sprintf(writeBuffer,"%d", PORT_START+i);
+                printf("sent to client %d udp port %s on socket %d\n", i, writeBuffer, tcpSockets[i]);
+                if((send(tcpSockets[i], writeBuffer, sizeof(writeBuffer), 0)) < 0) {
+                    perror("send port number failed\n");
+                }
+            }
+            fflush(stdout);
             break;
         }
 	}
+
+    int numStopped = 0;
     while(true) {
         event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
 
@@ -255,21 +277,29 @@ int main (int argc, char **argv)
             //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
             n = recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
             if((strcmp(readBuffer, "stop")) == 0) {
-                printf("\n\nclient %d: stop received\n", events[i].data.fd);
+                printf("\n\nclient %d: stop received\n with count %d\n", events[i].data.fd, tCount[1]);
                 fflush(stdout);
+                
+                numStopped++;
                 break;
             }
-                
         }
+        if(numStopped == MAX_CLIENTS) {
+            break;
+        }
+    }
+
+    for(int i = 0; i < MAX_CLIENTS; i++) {
+            printf("%d\t%d\n", i, tCount[i]);
     }
 
     // for(int z = 0; z < MAX_CLIENTS; z++) {
     //     pthread_join(tid[z], &tCount[z]);
     // }
     for(int x = 0; x < MAX_CLIENTS; x++) {
-        printf("Thread #: %d\t%d", tid[x], tCount[x]);
+        printf("Client #: %d\t%d\n", x, tCount[x]);
         close(tcpSockets[x]);
-        close(udpSockets[x]);
+        //close(udpSockets[x]);
     }
 	close(sd);
     remove_semaphore(sem_id);
