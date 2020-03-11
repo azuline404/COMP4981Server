@@ -33,7 +33,9 @@ string LobbyManager::getLobbyList()
 			lobbyListJSON += ",";
 	}
 	// close off the json string
-	lobbyListJSON += "]}";
+	lobbyListJSON += "]";
+	lobbyListJSON = lobbyListJSON + ",\"statusCode\":\"" + "200";
+	lobbyListJSON += "}";
 	return lobbyListJSON;
 }
 
@@ -78,7 +80,7 @@ string LobbyManager::getLobby(int id)
 	lobbyJSON += "],";
 
 	// Rest of the lobby information
-	lobbyJSON += "\"lobbyID\":\"" + to_string(lobbyList[id]->getId()) + "\"," +
+	lobbyJSON += "\"lobbyID\":\"" + to_string(lobbyList[id]->getId()) + ",\"statusCode\":\"" + "200" + "\"," +
 		"\"lobbyStatus\":\"" + lobbyList[id]->getStatus() + "\"," +
 		"\"numPlayers\":\"" + to_string(lobbyList[id]->getCurrentPlayers()) + "\"" +
 		"}";
