@@ -100,14 +100,12 @@ void * clientThread(Client * client)
 	int bp;
 	int bytes_to_read = BUFLEN;
 	while (true) {
-		cout << "making a recv call" << endl;
 		n = recv (sd, buffer, bytes_to_read, 0);
 		if (n < 0) {
 			printf("didnt recieve anything, recv error\n");
 		}
 		cout << "Bytes received: " << n << endl;
 		const char * clientBuff = buffer;
-		printf("Received: %s\n", clientBuff);
 		try {
 			if (!validateJSON(buffer)) {
 				throw std::invalid_argument("bad json object");
@@ -131,7 +129,6 @@ void * clientThread(Client * client)
 				}
 			} 
 			else {
-				cout << "action reached" << endl;
 				Value::ConstMemberIterator itr = document.FindMember("action");
 				if (itr == document.MemberEnd()) {
 					throw std::invalid_argument("bad json object");
@@ -145,6 +142,7 @@ void * clientThread(Client * client)
 							cout << "request received to create lobby!" << endl;
 							//create lobby, send lobby back
 							lobbyID = lobbyManager->createLobby(client);
+							cout << "lobby list so far: " << lobbyManager->getLobbyList() << endl;
 							lobbyResponse = lobbyManager->getLobby(lobbyID);
 							cout << "Lobby response: " << lobbyResponse << endl;
 							send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
@@ -163,6 +161,7 @@ void * clientThread(Client * client)
 							break;
 						case GET_ALL:
 							// get a json string containing the lobby list, send the list back
+							cout << "received request to get lobby list!" << endl;
 							lobbyResponse = lobbyManager->getLobbyList();
 							cout << lobbyResponse << endl;
 							send(sd, lobbyResponse.c_str(), lobbyResponse.size(),0);

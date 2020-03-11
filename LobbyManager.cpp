@@ -24,7 +24,7 @@ string LobbyManager::getLobbyList()
 	// Iterate through the lobby list and resturn a string in json format
 	for (auto it = lobbyList.begin(); it != lobbyList.end(); it++)
 	{
-		lobbyListJSON += "{\"lobbyStatus\":\"" + (*it)->getStatus() + "\"," +
+		lobbyListJSON += "{\"lobbyId\":\"" + to_string((*it)->getId()) + "\","+ "\"lobbyStatus\":\"" + (*it)->getStatus() + "\"," +
 			"\"lobbyOwner\":\"" + to_string((*it)->getLobbyOwner()) + "\"," +
 			"\"numPlayers\":\"" + to_string((*it)->getCurrentPlayers()) + "\"}";
 

@@ -116,13 +116,24 @@ int main (int argc, char **argv)
 
 	printf ("%s\n", rbuf);
 
-	send (sd, newBuf3, BUFLEN, 0);
+	send (sd, newBuf2, BUFLEN, 0);
 
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
 	char newbuf[1024];
+	// client makes repeated calls to recv until no more data is expected to arrive.
+	n = recv (sd, newbuf, 1000, 0);
+
+	printf ("%s\n", newbuf);
+
+	send (sd, newBuf3, BUFLEN, 0);
+
+	printf("Receive:\n");
+	bp = rbuf;
+	bytes_to_read = BUFLEN;
+
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = recv (sd, newbuf, 1000, 0);
 
