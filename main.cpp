@@ -41,27 +41,7 @@ Client * clientList[20];
 int validateJSON(char * buffer) {
 
 
-	// if (document.Parse(buffer).HasParseError()) {
-	// 	cout << "Parse error" << endl;
-	// 	return 0;
-	// }
-	// Value::ConstMemberIterator itr = document.FindMember("messageType");
-	// if (itr == document.MemberEnd()) {
-	// 	cout << "Cannot find message type" << endl;
-	// 	return 0;
-	// }
-	// return 1;
-	
-	string str(buffer);
-	str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
-	str.erase(0,1);
-	str.pop_back();
-
-	int n = sizeof(str);
-	char temp[n];
-	strcpy(temp, str.c_str());
-
-	if (document.Parse(temp).HasParseError()) {
+	if (document.Parse(buffer).HasParseError()) {
 		cout << "Parse error" << endl;
 		return 0;
 	}
@@ -72,10 +52,30 @@ int validateJSON(char * buffer) {
 	}
 	return 1;
 	
+	// string str(buffer);
+	// str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
+	// str.erase(0,1);
+	// str.pop_back();
+
+	// int n = sizeof(str);
+	// char temp[n];
+	// strcpy(temp, str.c_str());
+
+	// if (document.Parse(temp).HasParseError()) {
+	// 	cout << "Parse error" << endl;
+	// 	return 0;
+	// }
+	// Value::ConstMemberIterator itr = document.FindMember("messageType");
+	// if (itr == document.MemberEnd()) {
+	// 	cout << "Cannot find message type" << endl;
+	// 	return 0;
+	// }
+	// return 1;
+	
 }
 string initialResponse(Client *client) {
-	const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200,\"response\":{\"docs\":[{\"eircode\":\"D02 YN32\"}]}}";
-	// const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200}";
+	// const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200,\"response\":{\"docs\":[{\"eircode\":\"D02 YN32\"}]}}";
+	const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200}";
 	Document ClientInfo;
 	ClientInfo.Parse(json);
 	Value & id = ClientInfo["userID"];
@@ -147,7 +147,6 @@ void * clientThread(Client * client)
 							lobbyID = lobbyManager->createLobby(client);
 							lobbyResponse = lobbyManager->getLobby(lobbyID);
 							cout << "Lobby response: " << lobbyResponse << endl;
-							cout << "size of lobby: " << sizeof(lobbyResponse);
 							send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
 							break;
 						case DESTROY:
@@ -166,7 +165,7 @@ void * clientThread(Client * client)
 							// get a json string containing the lobby list, send the list back
 							lobbyResponse = lobbyManager->getLobbyList();
 							cout << lobbyResponse << endl;
-							send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
+							send(sd, lobbyResponse.c_str(), lobbyResponse.size(),0);
 							break;
 						case JOIN:
 							{
@@ -179,6 +178,7 @@ void * clientThread(Client * client)
 								Lobby * lobby = lobbyManager->getLobbyObject(lobbyID);
 								lobby->addClient(client);
 								lobbyResponse = lobbyManager->getLobby(lobbyID);
+								cout << "Lobby list response: " << lobbyResponse << endl;
 								send(sd, lobbyResponse.c_str(), lobbyResponse.size(),0);
 							}
 							break;

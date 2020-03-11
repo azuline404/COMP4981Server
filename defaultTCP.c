@@ -122,10 +122,11 @@ int main (int argc, char **argv)
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
+	char newbuf[1024];
 	// client makes repeated calls to recv until no more data is expected to arrive.
-	n = recv (sd, rbuf, 1000, 0);
+	n = recv (sd, newbuf, 1000, 0);
 
-	printf ("%s\n", rbuf);
+	printf ("%s\n", newbuf);
 
 	while (1) {
 
