@@ -70,40 +70,16 @@ void * clientThread(void *arg)
 
 	const int test = 1;
     int n;
-<<<<<<< HEAD
-	int bytes_to_read = BUFLEN;
-    int count = 1;
-    while(true) {
-        memset(readBuffer, 0, BUFLEN);
-        n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
-        //printf("\n\nRECEIVED:\n %s \n\n", readBuffer);
-=======
     int count = 1;
     int client_no = -1;
     int event_count;
     while(true) {
         memset(readBuffer, 0, BUFLEN);
         n = recvfrom(info->udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
->>>>>>> 077039fd147d92102b411d1a1ca68f226e23d848
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
         }
-<<<<<<< HEAD
-
-        // Document serverDocument;
-        // serverDocument.Parse(gameObject);
-        // Value & serverPlayers = serverDocument["players"];
-        char * tempBuf = readBuffer;
-        Document playerDocument;
-        playerDocument.Parse(tempBuf);
-        Value& players = playerDocument["players"];
-    	const Value& currentPlayer = players[0];
-        memset(writeBuffer, 0, BUFLEN);
-        update_json( writeBuffer,&currentPlayer);
-        printf("\n\nclient %d: %d", players[0]["id"].GetInt(), count++);
-		//sendto (udpSock, writeBuffer, BUFLEN, 0, (struct sockaddr*)&server, sizeof(server));
-=======
 
         char * tempBuf = readBuffer;
         Document playerDocument;
@@ -115,7 +91,6 @@ void * clientThread(void *arg)
         update_json( gameObjectBuffer,&currentPlayer);
         count++;
 
->>>>>>> 077039fd147d92102b411d1a1ca68f226e23d848
     }
     fflush(stdout);
     return (void*)count;

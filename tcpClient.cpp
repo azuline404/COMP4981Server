@@ -237,7 +237,7 @@ int main (int argc, char **argv)
 	//clear send buffer, write "stop" to send buffer, send
 	memset(sbuf, 0, BUFLEN);
 	strcpy(sbuf, "stop");
-	printf("sbuf: ", sbuf);
+	printf("sbuf: %s", sbuf);
 	if(send(sd, sbuf, BUFLEN, 0) < 0) {
 		perror("send stop");
 	}
@@ -245,9 +245,9 @@ int main (int argc, char **argv)
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
-	n = 0; 1501-1549
+	n = 0;
 	//Wait for server response that will never arrive
-	recvfrom(udpSocket, buf, sizeof(buf), 0, NULL, NULL);
+	recvfrom(udpSocket, rbuf, sizeof(rbuf), 0, NULL, NULL);
 
 	printf ("\n\nReceived: %s\n", rbuf);
 	fflush(stdout);
