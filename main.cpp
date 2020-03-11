@@ -130,23 +130,20 @@ void * clientThread(void *arg)
 int main(void)
 {
 	Client *c1 = new Client("Warlock", 0, 2313, 131, 213);
-	Client  c2("Monk", 0, 2313, 131, 213);
-	Client  c3("Mage", 1, 2313, 131, 213);
-	Client  c4("Shaman", 1, 2313, 131, 213);
+	Client *c2 = new Client("Monk", 0, 2313, 131, 213);
+	Client *c3 = new Client("Mage", 1, 2313, 131, 213);
+	Client *c4 = new Client("Shaman", 1, 2313, 131, 213);
 
-	// Client *c1p = &c1;
-	Client *c2p = &c2;
-	Client *c3p = &c3;
-	// Client *c4p = &c4;
-
+	c1->setPlayer_name("nicole");
+	
 	LobbyManager lm;
 	lm.createLobby(c1);
-	lm.getLobbyObject(0)->addClient(c3p);
-	lm.getLobbyObject(0)->addClient(c2p);
-	
+	lm.getLobbyObject(0)->addClient(c2);
+	lm.getLobbyObject(0)->addClient(c3);
+	lm.getLobbyObject(0)->addClient(c4);	
 
-	cout << "Lobby Info: " <<  lm.getLobby(0) << endl;
-	cout << "Lobby List: " << lm.getLobbyList() << endl;
+	cout << endl << "Lobby Info: " <<  lm.getLobby(0) << endl;
+	cout << endl << "Lobby List: " << lm.getLobbyList() << endl;
 
 	return 0;
 }

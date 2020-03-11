@@ -1,13 +1,21 @@
 /*
- *   NAME:            LobbyManager.cpp
- *   DESC:            This class 
- *   DESIGNER:        Ash Ketchum
- *   PROGRAMMER:    Pikachu
- *   REVISIONS:        Added more spaces
- *               Nicole J & Chirag F (March 10, 2020) - getlobyList() & getLobby()
+ *  NAME:            LobbyManager.cpp
+ *  DESC:            This class 
+ *  DESIGNER:        Ash Ketchum
+ *  PROGRAMMER:      Pikachu
+ *  REVISIONS:       Nicole J &Chirag F (March 10, 2020):
+ *						- getlobyList() &getLobby() functionality implemented
  */
 #include "LobbyManager.hpp"
 
+/*
+ *   NAME:            getLobbyList()
+ *   DESC:            This function returns a string of the lobby list information in 
+ *					  json format
+ *   DESIGNER:        Ash Ketchum
+ *   PROGRAMMER:      Nicole J & Chirag F
+ *   REVISIONS:       NA
+ */
 string LobbyManager::getLobbyList()
 {
 	// start of the json string
@@ -30,6 +38,16 @@ string LobbyManager::getLobbyList()
 	return lobbyListJSON;
 }
 
+/*
+ *   NAME:            getLobby(int id)
+ *   DESC:            This function returns the lobby information including the players 
+ *					  given the owners id.
+ *   DESIGNER:        Ash Ketchum
+ *   PROGRAMMER:      Nicole J & Chirag F
+ *   REVISIONS:       Nicole J (March 11, 2020):
+ *						- Fixed bug with the string in formatter in the loop 											
+ */
+
 string LobbyManager::getLobby(int id)
 {
 	// Start the json string
@@ -41,10 +59,10 @@ string LobbyManager::getLobby(int id)
 	// Make a copy of the current client list
 	vector<Client*> currentClientList = lobbyList[id]->getClientList();
 
-    // Iterate through the client list
+	// Iterate through the client list
 	for (auto it = currentClientList.begin(); it != currentClientList.end(); it++)
 	{
-        // create a string of the client information in json format 
+		// create a string of the client information in json format 
 		lobbyJSON += "{\"id\": \"" + to_string((*it)->getPlayer_Id()) + "\"," +
 			"\"class\":\"" + (*it)->getCharacterClass() + "\"," +
 			"\"ready\":\"" + (*it)->getStatus() + "\"," +
@@ -52,23 +70,30 @@ string LobbyManager::getLobby(int id)
 			"\"team\":\"" + to_string((*it)->getTeam()) + "\"" +
 			+"}";
 
-        // include a "," id its not the end of the client list
+		// include a "," id its not the end of the client list
 		if (next(it, 1) != currentClientList.end())
 			lobbyJSON += ",";
 	}
-    
-    // End of the player list array
+
+	// End of the player list array
 	lobbyJSON += "],";
 
-    // Rest of the lobby information
+	// Rest of the lobby information
 	lobbyJSON += "\"lobbyID\":\"" + to_string(lobbyList[id]->getId()) + "\"," +
 		"\"lobbyStatus\":\"" + lobbyList[id]->getStatus() + "\"," +
 		"\"numPlayers\":\"" + to_string(lobbyList[id]->getCurrentPlayers()) + "\"" +
 		"}";
-    
+
 	return lobbyJSON;
 }
 
+/*
+ *   NAME:            deleteLobby(int lobbyId)
+ *   DESC:            This function deletes a lobby from the lobbyList
+ *   DESIGNER:        Ash Ketchum
+ *   PROGRAMMER:      Tommy C 
+ *   REVISIONS:       NA										
+ */
 void LobbyManager::deleteLobby(int lobbyId)
 {
 
@@ -88,6 +113,15 @@ void LobbyManager::deleteLobby(int lobbyId)
 	}
 }
 
+/*
+ *   NAME:            createLobby(Client *client)
+ *   DESC:            This function cretes a new lobby given a client. Client
+ * 					  is then added to the lobby, and lobby is addde to the
+ * 					  lobby list
+ *   DESIGNER:        Ash Ketchum
+ *   PROGRAMMER:      Tommy C 
+ *   REVISIONS:       NA										
+ */
 void LobbyManager::createLobby(Client *client)
 {
 	int id = client->getPlayer_Id();
@@ -97,6 +131,13 @@ void LobbyManager::createLobby(Client *client)
 	lobbyList.push_back(lobby);
 }
 
+/*
+ *   NAME:            getLobbyObject(int id)
+ *   DESC:            This function returns the game lobby object given an id
+ *   DESIGNER:        Ash Ketchum
+ *   PROGRAMMER:      Tommy C 
+ *   REVISIONS:       NA										
+ */
 Lobby *LobbyManager::getLobbyObject(int id)
 {
 	return lobbyList[id];
