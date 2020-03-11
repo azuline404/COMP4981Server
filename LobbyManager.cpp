@@ -48,7 +48,7 @@ string LobbyManager::getLobby(int id)
 		lobbyJSON += "{\"id\": \"" + to_string((*it)->getPlayer_Id()) + "\"," +
 			"\"class\":\"" + (*it)->getCharacterClass() + "\"," +
 			"\"ready\":\"" + (*it)->getStatus() + "\"," +
-			"\"name\":\"" + (*it)->getPlayer_name() + "\"," +
+			"\"username\":\"" + (*it)->getPlayer_name() + "\"," +
 			"\"team\":\"" + to_string((*it)->getTeam()) + "\"" +
 			+"}";
 
@@ -88,13 +88,14 @@ void LobbyManager::deleteLobby(int lobbyId)
 	}
 }
 
-void LobbyManager::createLobby(Client *client)
+int LobbyManager::createLobby(Client *client)
 {
 	int id = client->getPlayer_Id();
 	Lobby *lobby = new Lobby(id);
 	lobby->addClient(client);
 	client->setLobby_Id(lobby->getId());
 	lobbyList.push_back(lobby);
+	return lobby->getId();
 }
 
 Lobby *LobbyManager::getLobbyObject(int id)

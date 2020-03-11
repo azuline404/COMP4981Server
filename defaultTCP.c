@@ -90,6 +90,7 @@ int main (int argc, char **argv)
 	printf("\t\tIP Address: %s\n", inet_ntop(hp->h_addrtype, *pptr, str, sizeof(str)));
 	//gets(sbuf); // get user's text
 	const char * newBuf = "{\"messageType\":\"connect\",\"username\": \"tommychang\"}";
+	const char * newBuf2 = "{\"messageType\":\"lobbyRequest\",\"action\":0}";
 
 	// Transmit data through the socket
 	send (sd, newBuf, BUFLEN, 0);
@@ -100,8 +101,19 @@ int main (int argc, char **argv)
 
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = recv (sd, bp, bytes_to_read, 0);
-	
+
 	printf ("%s\n", rbuf);
+
+	// send (sd, newBuf2, BUFLEN, 0);
+
+	// printf("Receive:\n");
+	// bp = rbuf;
+	// bytes_to_read = BUFLEN;
+
+	// // client makes repeated calls to recv until no more data is expected to arrive.
+	// n = recv (sd, bp, bytes_to_read, 0);
+
+	// printf ("%s\n", rbuf);
 	fflush(stdout);
 	close (sd);
 	return (0);

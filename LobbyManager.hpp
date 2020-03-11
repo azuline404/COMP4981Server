@@ -4,7 +4,7 @@ using namespace std;
 class LobbyManager {
     public:
         LobbyManager() = default;
-        void createLobby(Client * client);
+        int createLobby(Client * client);
         string getLobby(int id);
         string getLobbyList();
         void deleteLobby(int lobbyId);
