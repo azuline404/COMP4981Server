@@ -34,9 +34,10 @@
 #include <strings.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <cstring>
 
 #define SERVER_TCP_PORT		7000	// Default port
-#define BUFLEN			80  	// Buffer length
+#define BUFLEN			1024  	// Buffer length
 
 int main (int argc, char **argv)
 {
@@ -89,31 +90,46 @@ int main (int argc, char **argv)
 	pptr = hp->h_addr_list;
 	printf("\t\tIP Address: %s\n", inet_ntop(hp->h_addrtype, *pptr, str, sizeof(str)));
 	//gets(sbuf); // get user's text
-	const char * newBuf = "{\"messageType\":\"connect\",\"username\": \"tommychang\"}";
+	char newBuf []= "{\"messageType\":\"connect\",\"username\": \"tommychang\"}";
 	const char * newBuf2 = "{\"messageType\":\"lobbyRequest\",\"action\":0}";
-
+	const char * newBuf3 = "{\"messageType\":\"lobbyRequest\",\"action\":2}";
 	// Transmit data through the socket
-	send (sd, newBuf, BUFLEN, 0);
+	send (sd, newBuf, sizeof(newBuf), 0);
 
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
 	// client makes repeated calls to recv until no more data is expected to arrive.
-	n = recv (sd, bp, bytes_to_read, 0);
+	n = recv (sd, rbuf, 1000, 0);
 
 	printf ("%s\n", rbuf);
 
-	// send (sd, newBuf2, BUFLEN, 0);
+	send (sd, newBuf2, BUFLEN, 0);
 
-	// printf("Receive:\n");
-	// bp = rbuf;
-	// bytes_to_read = BUFLEN;
+	printf("Receive:\n");
+	bp = rbuf;
+	bytes_to_read = BUFLEN;
 
-	// // client makes repeated calls to recv until no more data is expected to arrive.
-	// n = recv (sd, bp, bytes_to_read, 0);
+	// client makes repeated calls to recv until no more data is expected to arrive.
+	n = recv (sd, rbuf, 1000, 0);
 
-	// printf ("%s\n", rbuf);
+	printf ("%s\n", rbuf);
+
+	send (sd, newBuf3, BUFLEN, 0);
+
+	printf("Receive:\n");
+	bp = rbuf;
+	bytes_to_read = BUFLEN;
+
+	// client makes repeated calls to recv until no more data is expected to arrive.
+	n = recv (sd, rbuf, 1000, 0);
+
+	printf ("%s\n", rbuf);
+
+	while (1) {
+
+	}
 	fflush(stdout);
 	close (sd);
 	return (0);

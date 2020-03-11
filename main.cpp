@@ -19,6 +19,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 #include <thread>
+#include <algorithm>
 
 
 using namespace std;
@@ -38,7 +39,29 @@ Document document;
 Client * clientList[20];
 
 int validateJSON(char * buffer) {
-	if (document.Parse(buffer).HasParseError()) {
+
+
+	// if (document.Parse(buffer).HasParseError()) {
+	// 	cout << "Parse error" << endl;
+	// 	return 0;
+	// }
+	// Value::ConstMemberIterator itr = document.FindMember("messageType");
+	// if (itr == document.MemberEnd()) {
+	// 	cout << "Cannot find message type" << endl;
+	// 	return 0;
+	// }
+	// return 1;
+	
+	string str(buffer);
+	str.erase(std::remove(str.begin(), str.end(), '\\'), str.end());
+	str.erase(0,1);
+	str.pop_back();
+
+	int n = sizeof(str);
+	char temp[n];
+	strcpy(temp, str.c_str());
+
+	if (document.Parse(temp).HasParseError()) {
 		cout << "Parse error" << endl;
 		return 0;
 	}
@@ -51,7 +74,8 @@ int validateJSON(char * buffer) {
 	
 }
 string initialResponse(Client *client) {
-	const char * json = "{\"userID\":0,\"UDPPort\":0}";
+	const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200,\"response\":{\"docs\":[{\"eircode\":\"D02 YN32\"}]}}";
+	// const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200}";
 	Document ClientInfo;
 	ClientInfo.Parse(json);
 	Value & id = ClientInfo["userID"];
@@ -75,11 +99,13 @@ void * clientThread(Client * client)
 	int n;
 	int bp;
 	int bytes_to_read = BUFLEN;
-	// while (true) {
+	while (true) {
+		cout << "making a recv call" << endl;
 		n = recv (sd, buffer, bytes_to_read, 0);
 		if (n < 0) {
 			printf("didnt recieve anything, recv error\n");
 		}
+		cout << "Bytes received: " << n << endl;
 		const char * clientBuff = buffer;
 		printf("Received: %s\n", clientBuff);
 		try {
@@ -96,9 +122,10 @@ void * clientThread(Client * client)
 				}
 				string username = document["username"].GetString();
 				client->setPlayer_name(username);
+				client->setStatus("false");
 				string response = initialResponse(client);
 				std::cout << "Sending back response: " << response.c_str() << endl;
-				int n = send(sd, response.c_str(), sizeof(response), 0);
+				int n = send(sd, response.c_str(), response.size(), 0);
 				if (n < 0) {
 					cout << "Failed to send!" << endl;
 				}
@@ -116,11 +143,12 @@ void * clientThread(Client * client)
 					switch(action) {
 						case CREATE:
 							cout << "request received to create lobby!" << endl;
-							// create lobby, send lobby back
-							// lobbyID = lobbyManager->createLobby(client);
-							// lobbyResponse = lobbyManager->getLobby(lobbyID);
-							// cout << "Lobby response: " << lobbyResponse << endl;
-							// send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse), 0);
+							//create lobby, send lobby back
+							lobbyID = lobbyManager->createLobby(client);
+							lobbyResponse = lobbyManager->getLobby(lobbyID);
+							cout << "Lobby response: " << lobbyResponse << endl;
+							cout << "size of lobby: " << sizeof(lobbyResponse);
+							send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
 							break;
 						case DESTROY:
 							// {
@@ -137,7 +165,8 @@ void * clientThread(Client * client)
 						case GET_ALL:
 							// get a json string containing the lobby list, send the list back
 							lobbyResponse = lobbyManager->getLobbyList();
-							// send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
+							cout << lobbyResponse << endl;
+							send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
 							break;
 						case JOIN:
 							{
@@ -150,7 +179,7 @@ void * clientThread(Client * client)
 								Lobby * lobby = lobbyManager->getLobbyObject(lobbyID);
 								lobby->addClient(client);
 								lobbyResponse = lobbyManager->getLobby(lobbyID);
-								send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
+								send(sd, lobbyResponse.c_str(), lobbyResponse.size(),0);
 							}
 							break;
 						case LEAVE:
@@ -187,7 +216,7 @@ void * clientThread(Client * client)
 			// string errorResponse = "{\"status\":400}";
 			// int n = send(sd, errorResponse.c_str(), sizeof(errorResponse), 0);
 		}
-	// }
+	}
 	close (sd);
     return NULL;
 }

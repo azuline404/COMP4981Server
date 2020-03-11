@@ -74,7 +74,6 @@ int Client::getTeam()
     return this->team;
 }
 
-
 void Client::setTeam(int team)
 {
     this->team = team;
