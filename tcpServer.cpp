@@ -26,9 +26,10 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 16  
+#define MAX_CLIENTS 16 
 #define MAX_EVENTS 2
 #define PORT_START 12500
+
 volatile int UDP_PORT = 12500;
 
 using namespace std;
@@ -46,13 +47,10 @@ int init_semaphore(int sem_id, key_t key);
 void P(int sem_id);
 void V(int sem_id);
 int remove_semaphore(int sem_id);
-
 void catch_signal(int sig);
 
 int sem_id;
-
 volatile int start = 0;
-
 int tCount[MAX_CLIENTS] = {0};
 
 void * clientThread(void *t_info)
@@ -60,8 +58,8 @@ void * clientThread(void *t_info)
     int *index = (int*) t_info;
     int in = *index;
 
-    printf("in: %d", in);
-
+    printf("in: %d with port: %d\n", in, UDP_PORT);
+    int port_number = PORT_START + in;
     int udpSocket;
     char writeBuffer[BUFLEN];
     char gameObjectBuffer[GAME_OBJECT_BUFFER];
@@ -69,13 +67,14 @@ void * clientThread(void *t_info)
     struct sockaddr_in udpServer;
     memset(&udpServer, 0, sizeof(udpServer));
     udpServer.sin_family = AF_INET;
-    udpServer.sin_port = htons(UDP_PORT);
+    udpServer.sin_port = htons(port_number);
     udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
     udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     const int i = 1;
+
     if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
         perror("SET SOCK OPT FAILED");
     };
@@ -85,11 +84,7 @@ void * clientThread(void *t_info)
         exit(1);
     }
 
-//	const int test = 1;
     int n;
-//    int count = 1;
-//    int client_no = -1;
-//    int event_count;
 
     printf("starting client %d \n", in);
     while(true) {
@@ -100,10 +95,10 @@ void * clientThread(void *t_info)
             printf("didnt recieve anything, recv error");
             exit(1);
         }
+        printf("received from client in %d: \n %s\n", in, readBuffer);
 
         char * tempBuf = readBuffer;
-        
-        // printf("readBuffer for client %d: %s\n", in, readBuffer);
+    
         fflush(stdout);
 
         Document playerDocument;
@@ -114,7 +109,6 @@ void * clientThread(void *t_info)
         memset(gameObjectBuffer, 0, BUFLEN);
         update_json( gameObjectBuffer,&currentPlayer);
         tCount[in]++;
-        //printf("tCount[in]: %d\tin:%d\n", tCount[in], in);
     }
     fflush(stdout);
     return NULL;
