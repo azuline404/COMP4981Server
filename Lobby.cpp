@@ -56,3 +56,17 @@ void Lobby::addClient(Client * client) {
     client->setLobby_Id(lobbyID);
     this->currentPlayers++;
 }
+
+void Lobby::removeClient(Client *client)
+{
+
+}
+
+void Lobby::removeAllClients()
+{
+    auto iter = clientList.begin();
+    for ( ; iter != clientList.end(); iter++)
+        (*iter)->setLobby_Id(-1);
+    clientList.clear();
+    this->currentPlayers = 0;
+}

@@ -135,3 +135,20 @@ Lobby *LobbyManager::getLobbyObject(int id)
 {
 	return lobbyList[id];
 }
+
+/*
+ *   NAME:            verifyLobbyOwner(Client *client)
+ *   DESC:            This function verifies whether the given client owns a lobby or not.
+ *   DESIGNER:        Sun Kim
+ *   PROGRAMMER:      Sun Kim
+ *   REVISIONS:       NA										
+ */
+int LobbyManager::verifyLobbyOwner(Client *client)
+{
+    int id = client->getPlayer_Id();
+    int clientLobbyId = client->getLobby_Id();
+    if (id == clientLobbyId)
+        return id;
+    else
+        return -1;
+}

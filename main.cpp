@@ -146,6 +146,21 @@ void * clientThread(Client * client)
 							send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
 							break;
 						case DESTROY:
+							{
+								cout << "Request received to destroy the lobby!" << endl;
+								lobbyID = lobbyManager->verifyLobbyOwner(client);
+								if (lobbyID == -1)
+								{
+									cout << "The current client is not a Lobby owner!" << endl;
+									break;
+								}
+								Lobby* lobby1 = lobbyManager->getLobbyObject(lobbyID);
+								lobby1->removeAllClients();
+								lobbyManager->deleteLobby(lobbyID);
+								lobbyResponse = lobbyManager->getLobbyList();
+								cout << "Lobby list response: " << lobbyResponse << endl;
+								send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
+							}
 							// {
 							// 	Value::ConstMemberIterator itr = document.FindMember("lobbyId");
 							// 	if (itr == document.MemberEnd()) {

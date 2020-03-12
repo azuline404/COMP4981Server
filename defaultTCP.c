@@ -34,7 +34,6 @@
 #include <strings.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <cstring>
 
 #define SERVER_TCP_PORT		7000	// Default port
 #define BUFLEN			1024  	// Buffer length
@@ -93,51 +92,55 @@ int main (int argc, char **argv)
 	char newBuf []= "{\"messageType\":\"connect\",\"username\": \"tommychang\"}";
 	const char * newBuf2 = "{\"messageType\":\"lobbyRequest\",\"action\":0}";
 	const char * newBuf3 = "{\"messageType\":\"lobbyRequest\",\"action\":2}";
+	const char * destBuf = "{\"messageType\":\"lobbyRequest\",\"action\":1}";
+
+	/* TEST CONNECTING */
 	// Transmit data through the socket
 	send (sd, newBuf, sizeof(newBuf), 0);
-
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
-
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = recv (sd, rbuf, 1000, 0);
-
 	printf ("%s\n", rbuf);
 
+	/* TEST CREATING LOBBY */
 	send (sd, newBuf2, BUFLEN, 0);
-
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
-
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = recv (sd, rbuf, 1000, 0);
-
 	printf ("%s\n", rbuf);
 
-	send (sd, newBuf2, BUFLEN, 0);
+	/* TEST */
+	// send (sd, newBuf2, BUFLEN, 0);
+	// printf("Receive:\n");
+	// bp = rbuf;
+	// bytes_to_read = BUFLEN;
+	// char newbuf[1024];
+	// // client makes repeated calls to recv until no more data is expected to arrive.
+	// n = recv (sd, newbuf, 1000, 0);
+	// printf ("%s\n", newbuf);
 
-	printf("Receive:\n");
-	bp = rbuf;
-	bytes_to_read = BUFLEN;
-
+	/* TEST GETALL LOBBY */
 	char newbuf[1024];
-	// client makes repeated calls to recv until no more data is expected to arrive.
-	n = recv (sd, newbuf, 1000, 0);
-
-	printf ("%s\n", newbuf);
-
 	send (sd, newBuf3, BUFLEN, 0);
-
 	printf("Receive:\n");
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
-
 	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = recv (sd, newbuf, 1000, 0);
-
 	printf ("%s\n", newbuf);
+
+	/* TEST DESTROY LOBBY*/
+	char tmpbuf[1024];
+	send (sd, destBuf, BUFLEN, 0);
+	printf("Receive:\n");
+	bp = rbuf;
+	bytes_to_read = BUFLEN;
+	n = recv(sd, tmpbuf, 1000, 0);
+	printf ("%s\n", tmpbuf);
 
 	while (1) {
 
