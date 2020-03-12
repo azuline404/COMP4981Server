@@ -9,6 +9,7 @@ class LobbyManager {
         string getLobbyList();
         void deleteLobby(int lobbyId);
         Lobby * getLobbyObject(int id);
+        int verifyLobbyOwner(Client* client);
     private:
         std::vector<Lobby*>lobbyList;
 };
