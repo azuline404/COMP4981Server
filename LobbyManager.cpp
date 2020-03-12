@@ -19,13 +19,14 @@
 string LobbyManager::getLobbyList()
 {
 	// start of the json string
-	string lobbyListJSON = "{\"lobbies\":[";
+	string lobbyListJSON = "{\"statusCode\":200";
+	lobbyListJSON += ",\"Lobbies\":[";
 
 	// Iterate through the lobby list and resturn a string in json format
 	for (auto it = lobbyList.begin(); it != lobbyList.end(); it++)
 	{
 		lobbyListJSON += "{\"lobbyId\":\"" + to_string((*it)->getId()) + "\","+ "\"lobbyStatus\":\"" + (*it)->getStatus() + "\"," +
-			"\"lobbyOwner\":\"" + to_string((*it)->getLobbyOwner()) + "\"," +
+			"\"lobbyOwnerId\":\"" + to_string((*it)->getLobbyOwner()) + "\"," +
 			"\"numPlayers\":\"" + to_string((*it)->getCurrentPlayers()) + "\"}";
 
 		// if not the end add a ","
@@ -34,7 +35,6 @@ string LobbyManager::getLobbyList()
 	}
 	// close off the json string
 	lobbyListJSON += "]";
-	lobbyListJSON = lobbyListJSON + ",\"statusCode\":\"" + "200";
 	lobbyListJSON += "}";
 	return lobbyListJSON;
 }
@@ -52,10 +52,10 @@ string LobbyManager::getLobbyList()
 string LobbyManager::getLobby(int id)
 {
 	// Start the json string
-	string lobbyJSON = "{";
+	string lobbyJSON = "{\"statusCode\":200";
 
 	// Start of "Players" key of player array
-	lobbyJSON += "\"Players\":[";
+	lobbyJSON += ",\"Players\":[";
 
 	// Make a copy of the current client list
 	vector<Client*> currentClientList = lobbyList[id]->getClientList();
@@ -79,10 +79,20 @@ string LobbyManager::getLobby(int id)
 	// End of the player list array
 	lobbyJSON += "],";
 
+	int lobbyOwner = lobbyList[id]->getLobbyOwner();
+	string ownerName;
+	vector<Client*> clientList = lobbyList[id]->getClientList();
+
+	for (auto it = clientList.begin(); it != clientList.end(); it++) {
+		if ((*it)->getPlayer_Id() == lobbyOwner) {
+			ownerName = (*it)->getPlayer_name();
+			break;
+		} 
+	}
 	// Rest of the lobby information
-	lobbyJSON += "\"lobbyID\":\"" + to_string(lobbyList[id]->getId()) + ",\"statusCode\":\"" + "200" + "\"," +
+	lobbyJSON += "\"lobbyId\":\"" + to_string(lobbyList[id]->getId()) + "\"," +
 		"\"lobbyStatus\":\"" + lobbyList[id]->getStatus() + "\"," +
-		"\"numPlayers\":\"" + to_string(lobbyList[id]->getCurrentPlayers()) + "\"" +
+		"\"lobbyOwnerName\":\"" + ownerName + "\"" + ",\"lobbyOwnerId\":\"" + to_string(lobbyOwner) + "\"" + ",\"numPlayers\":\"" + to_string(lobbyList[id]->getCurrentPlayers()) + "\"" +
 		"}";
 
 	return lobbyJSON;

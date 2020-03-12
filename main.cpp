@@ -75,7 +75,7 @@ int validateJSON(char * buffer) {
 }
 string initialResponse(Client *client) {
 	// const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200,\"response\":{\"docs\":[{\"eircode\":\"D02 YN32\"}]}}";
-	const char * json = "{\"userID\":0,\"UDPPort\":0,\"statusCode\":200}";
+	const char * json = "{\"statusCode\":200,\"userID\":0,\"UDPPort\":0}";
 	Document ClientInfo;
 	ClientInfo.Parse(json);
 	Value & id = ClientInfo["userID"];
@@ -180,19 +180,17 @@ void * clientThread(Client * client)
 							}
 							break;
 						case LEAVE:
-							// {
-							// 	Value::ConstMemberIterator itr = document.FindMember("lobbyId");
-							// 	if (itr == document.MemberEnd()) {
-							// 		throw std::invalid_argument("bad json object");
-							// 	}
-							// 	lobbyID = document["lobbyId"].GetInt();
-							// 	Lobby * lobby = lobbyManager->getLobbyObject(lobbyID);
-							// 	lobby->removeClient(client);
-							// 	lobbyResponse = lobbyManager->getLobby(lobbyID);
-							// 	send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
-							// }
-							//lobbymanager.getLobby(id).remove(client);
-							// respond with code 200
+							{
+								// Value::ConstMemberIterator itr = document.FindMember("lobbyId");
+								// if (itr == document.MemberEnd()) {
+								// 	throw std::invalid_argument("bad json object");
+								// }
+								// lobbyID = document["lobbyId"].GetInt();
+								// Lobby * lobby = lobbyManager->getLobbyObject(lobbyID);
+								// lobby->removeClient(client);
+								// lobbyResponse = lobbyManager->getLobby(lobbyID);
+								// send(sd, lobbyResponse.c_str(), sizeof(lobbyResponse),0);
+							}
 							break;
 					}
 				}
@@ -210,8 +208,8 @@ void * clientThread(Client * client)
 			}
 		} catch (...) {
 			printf("Catching an exception");
-			// string errorResponse = "{\"status\":400}";
-			// int n = send(sd, errorResponse.c_str(), sizeof(errorResponse), 0);
+			string errorResponse = "{\"statusCode\":500}";
+			send(sd, errorResponse.c_str(), errorResponse.size(), 0);
 		}
 	}
 	close (sd);
