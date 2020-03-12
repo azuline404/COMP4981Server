@@ -10,6 +10,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/msg.h>
+#include <signal.h>
+
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/document.h"
@@ -19,18 +24,13 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 
-#include <sys/sem.h>
-#include <semaphore.h>
-
 #define SERVER_TCP_PORT 7000	// Default port
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 16 
+#define MAX_CLIENTS 10
 #define MAX_EVENTS 2
 #define PORT_START 12500
-
-volatile int UDP_PORT = 12500;
 
 using namespace std;
 using namespace rapidjson;
@@ -41,17 +41,35 @@ struct tStruct {
     int clientNo;
 };
 
+struct circular {
+    int writeIndex;
+    int readIndex;
+    int bufferLength; /*can possibly be replaced with semaphore?*/
+    char buffer[MAX_CLIENTS][BUFLEN];
+};
+/*-----------Function prototypes-----------*/
+//JSON interaction functions
 int update_json(char* buffer, const Value *p);
-
+//Circular buffer functions
+int write_buffer(char* buffer);
+int read_buffer();
+void set_wIndex();
+void set_rIndex();
+void print_buffer();
+//Semaphore functions
 int init_semaphore(int sem_id, key_t key);
 void P(int sem_id);
 void V(int sem_id);
 int remove_semaphore(int sem_id);
-void catch_signal(int sig);
 
 int sem_id;
+int circular_sem;
 volatile int start = 0;
 int tCount[MAX_CLIENTS] = {0};
+volatile int UDP_PORT = 12500;
+struct circular* updates;
+
+int* updateCount;
 
 void * clientThread(void *t_info)
 {
@@ -95,11 +113,10 @@ void * clientThread(void *t_info)
             printf("didnt recieve anything, recv error");
             exit(1);
         }
-        printf("received from client in %d: \n %s\n", in, readBuffer);
+        fflush(stdout);
 
         char * tempBuf = readBuffer;
-    
-        fflush(stdout);
+        write_buffer(readBuffer);
 
         Document playerDocument;
         playerDocument.Parse(tempBuf);
@@ -154,6 +171,7 @@ int main (int argc, char **argv)
     int epoll_fd;
     int event_count;
     int n;
+    int pid;
     int tcpSockets[MAX_CLIENTS];
 
     pthread_t tid[MAX_CLIENTS];
@@ -162,6 +180,17 @@ int main (int argc, char **argv)
     char writeBuffer[BUFLEN];
 
     memset(tCount, 0, (MAX_CLIENTS * sizeof(int)));
+
+    updateCount = (int*)malloc(sizeof(int));
+    *updateCount = 200;
+
+    //Initialize circular buffer
+    updates = (struct circular*)malloc(sizeof(struct circular));
+    memset(updates, 0, sizeof(struct circular));
+    updates->writeIndex = 0;
+    updates->readIndex =0;
+    updates->bufferLength = 0;
+
     //initialize infoArray
     for(int i = 0; i < MAX_CLIENTS; i++) {
         infoArray[i] = new tStruct;
@@ -185,6 +214,22 @@ int main (int argc, char **argv)
         perror("init_semphore");
     }
     V(sem_id);
+
+    if((circular_sem = init_semaphore(sem_id, (key_t)12323)) == -1) {
+        perror("init circular semaphore");
+    }
+
+    if((pid = fork()) == -1) {
+        perror("Fork");
+    }
+
+    if(pid == 0) {
+        while(true) {
+            P(circular_sem);
+            read_buffer();
+        }
+    }
+
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
     const int j = 0;
@@ -287,17 +332,49 @@ int main (int argc, char **argv)
             printf("%d\t%d\n", i, tCount[i]);
     }
 
-    // for(int z = 0; z < MAX_CLIENTS; z++) {
-    //     pthread_join(tid[z], &tCount[z]);
-    // }
     for(int x = 0; x < MAX_CLIENTS; x++) {
         printf("Client #: %d\t%d\n", x, tCount[x]);
         close(tcpSockets[x]);
-        //close(udpSockets[x]);
     }
+    kill(pid, SIGINT);
+    printf("Update Count: %d\n", *updateCount);
 	close(sd);
-    remove_semaphore(sem_id);
+    if(remove_semaphore(sem_id) == -1) {
+        perror("Error removing semaphore");
+    }
 	return(0);
+}
+
+int write_buffer(char* buffer) {
+    V(circular_sem);
+    strcpy(updates->buffer[updates->writeIndex], buffer);
+    set_wIndex();
+}
+//This function should update the JSON?
+int read_buffer() {
+    printf("Start of read_buffer\n");
+    fflush(stdout);
+    //Update JSON function here
+    printf("Update JSON\n");
+    fflush(stdout);
+    printf("--%d--\n", *updateCount);
+    fflush(stdout);
+    memset(updates->buffer[updates->readIndex], 0, BUFLEN);
+    set_rIndex();
+}
+void set_wIndex() {
+    if(updates->writeIndex == (MAX_CLIENTS - 1)) {
+        updates->writeIndex = 0;
+    } else {
+        updates->writeIndex++;
+    }
+}
+void set_rIndex() {
+    if(updates->readIndex == (MAX_CLIENTS -1)) {
+        updates->readIndex = 0;
+    } else {
+        updates->readIndex++;
+    }
 }
 
 int init_semaphore(int sem_id, key_t key) {
@@ -329,7 +406,7 @@ void P(int sem_id) {
     sembuf_ptr->sem_flg = SEM_UNDO;
 
     if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error\n");
+	printf("semop error P\n");
 }
 
 void V(int sem_id) {
@@ -341,9 +418,9 @@ struct sembuf *sembuf_ptr;
     sembuf_ptr->sem_flg = SEM_UNDO;
 
     if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error\n");
+	printf("semop error V\n");
 }
 
 int remove_semaphore(int sem_id) {
-    semctl(sem_id, IPC_RMID, 0);
+    return(semctl(sem_id, IPC_RMID, 0));
 }
