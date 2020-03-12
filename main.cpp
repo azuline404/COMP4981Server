@@ -104,7 +104,6 @@ void * clientThread(Client * client)
 		if (n < 0) {
 			printf("didnt recieve anything, recv error\n");
 		}
-		cout << "Bytes received: " << n << endl;
 		const char * clientBuff = buffer;
 		try {
 			if (!validateJSON(buffer)) {
@@ -142,7 +141,6 @@ void * clientThread(Client * client)
 							cout << "request received to create lobby!" << endl;
 							//create lobby, send lobby back
 							lobbyID = lobbyManager->createLobby(client);
-							cout << "lobby list so far: " << lobbyManager->getLobbyList() << endl;
 							lobbyResponse = lobbyManager->getLobby(lobbyID);
 							cout << "Lobby response: " << lobbyResponse << endl;
 							send(sd, lobbyResponse.c_str(), lobbyResponse.size(), 0);
@@ -276,7 +274,7 @@ int main (int argc, char **argv)
 		clientList[numClients] = newClient;
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
 		threadList[i] = std::thread(clientThread, newClient);
-		threadList[i].join();
+		threadList[i].detach();
 	}
 	cout << "exiting while true..?" << endl;
 	// close(sd);
@@ -284,6 +282,7 @@ int main (int argc, char **argv)
 	// for (int i = 0; i < numClients; i++) {
 	// 	delete(clientList[i]);
 	// }
+
 
 	return(0);
 }
