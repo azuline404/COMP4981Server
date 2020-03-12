@@ -28,12 +28,15 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 10
+#define MAX_CLIENTS 16
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
 using namespace std;
 using namespace rapidjson;
+
+/*-----This file is a giant mess... needs some cleanup----*/
+/*-----I'll get to that eventually...-----*/
 
 struct tStruct {
     int tcpSocket;
@@ -41,12 +44,32 @@ struct tStruct {
     int clientNo;
 };
 
+/*
+ * TODO
+ * 	- Either
+ * 		a) add JSON interactions to read_buffer() function
+ * 		b) Create a new struct to hold data and only update JSON when preparing to send(Ellaine's idea)
+ * 	- Add a second semaphore for the write_buffer() function that interacts with the circular buffer?
+ * 	- Tomas: Discuss these fancy things with Ellaine
+ * 	- Ellaine: Look through this thing and see if all the stuff I altered today makes sense or
+ * 		   if you think we should redo some stuff
+ *	- Tomas/Ellaine/Both: Do some clean up
+ *		a) Create classes/Connect our stuff into Tommy's classes
+ *		b) Seperate into wrapper files (i.e semaphore functions, circular buffer functions, etc)
+ *		c) Fix the compiler warnings *low prio as long as things work?*
+ */
+
+//Struct for Circular buffer
+/*-----The circular buffer operates on a producer-consumer type pattern, do we need 2 semaphores?-----*/
 struct circular {
     int writeIndex;
     int readIndex;
     int bufferLength; /*can possibly be replaced with semaphore?*/
+    int updateCount; /*temp variable to check if read_buffer() running as intended,
+    		       should equal the total # of messages received*/
     char buffer[MAX_CLIENTS][BUFLEN];
 };
+
 /*-----------Function prototypes-----------*/
 //JSON interaction functions
 int update_json(char* buffer, const Value *p);
@@ -62,14 +85,15 @@ void P(int sem_id);
 void V(int sem_id);
 int remove_semaphore(int sem_id);
 
-int sem_id;
-int circular_sem;
+//Semaphore ID's
+int sem_id; circular_sem;
+
+//Are we still using this?
 volatile int start = 0;
+
 int tCount[MAX_CLIENTS] = {0};
 volatile int UDP_PORT = 12500;
 struct circular* updates;
-
-int* updateCount;
 
 void * clientThread(void *t_info)
 {
@@ -181,15 +205,13 @@ int main (int argc, char **argv)
 
     memset(tCount, 0, (MAX_CLIENTS * sizeof(int)));
 
-    updateCount = (int*)malloc(sizeof(int));
-    *updateCount = 200;
-
     //Initialize circular buffer
     updates = (struct circular*)malloc(sizeof(struct circular));
     memset(updates, 0, sizeof(struct circular));
     updates->writeIndex = 0;
     updates->readIndex =0;
     updates->bufferLength = 0;
+    updates->updateCount = 0;
 
     //initialize infoArray
     for(int i = 0; i < MAX_CLIENTS; i++) {
@@ -337,8 +359,8 @@ int main (int argc, char **argv)
         close(tcpSockets[x]);
     }
     kill(pid, SIGINT);
-    printf("Update Count: %d\n", *updateCount);
-	close(sd);
+    printf("Update Count: %d\n", updates->updateCount);
+    close(sd);
     if(remove_semaphore(sem_id) == -1) {
         perror("Error removing semaphore");
     }
@@ -350,15 +372,13 @@ int write_buffer(char* buffer) {
     strcpy(updates->buffer[updates->writeIndex], buffer);
     set_wIndex();
 }
-//This function should update the JSON?
+//This function should update the JSON
 int read_buffer() {
-    printf("Start of read_buffer\n");
-    fflush(stdout);
-    //Update JSON function here
-    printf("Update JSON\n");
-    fflush(stdout);
-    printf("--%d--\n", *updateCount);
-    fflush(stdout);
+    printf("start of read_buffer");
+    //ADD STUFF FOR UPDATING JSON FILE HERE
+
+    //Increment variable after updating file
+    updates->updateCount++;
     memset(updates->buffer[updates->readIndex], 0, BUFLEN);
     set_rIndex();
 }
