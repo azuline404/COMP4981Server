@@ -41,7 +41,7 @@
 
 
 #define SERVER_TCP_PORT		7000	// Default port
-#define BUFLEN			2000  	// Buffer length
+#define BUFLEN			3500  	// Buffer length
 
 using namespace rapidjson;
 

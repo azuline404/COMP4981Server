@@ -11,9 +11,9 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/ipc.h>
-#include <sys/sem.h>
 #include <sys/msg.h>
 #include <signal.h>
+#include <semaphore.h>
 
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
@@ -34,15 +34,6 @@
 
 using namespace std;
 using namespace rapidjson;
-
-/*-----This file is a giant mess... needs some cleanup----*/
-/*-----I'll get to that eventually...-----*/
-
-struct tStruct {
-    int tcpSocket;
-    int udpSocket;
-    int clientNo;
-};
 
 /*
  * TODO
@@ -69,6 +60,8 @@ struct circular {
     		       should equal the total # of messages received*/
     char buffer[MAX_CLIENTS][BUFLEN];
 };
+pthread_mutex_t circularBufferLock;
+
 
 /*-----------Function prototypes-----------*/
 //JSON interaction functions
@@ -79,17 +72,11 @@ int read_buffer();
 void set_wIndex();
 void set_rIndex();
 void print_buffer();
-//Semaphore functions
-int init_semaphore(int sem_id, key_t key);
-void P(int sem_id);
-void V(int sem_id);
-int remove_semaphore(int sem_id);
+
 
 //Semaphore ID's
-int sem_id; circular_sem;
+sem_t countsem, spacesem;
 
-//Are we still using this?
-volatile int start = 0;
 
 int tCount[MAX_CLIENTS] = {0};
 volatile int UDP_PORT = 12500;
@@ -139,24 +126,24 @@ void * clientThread(void *t_info)
         }
         fflush(stdout);
 
-        char * tempBuf = readBuffer;
-        write_buffer(readBuffer);
+        // char * tempBuf = readBuffer;
+        // write_buffer(readBuffer);
 
-        Document playerDocument;
-        playerDocument.Parse(tempBuf);
-        Value& players = playerDocument["players"];
-        const Value& currentPlayer = players[0];
+        // Document playerDocument;
+        // playerDocument.Parse(tempBuf);
+        // Value& players = playerDocument["players"];
+        // const Value& currentPlayer = players[0];
             
-        memset(gameObjectBuffer, 0, BUFLEN);
-        update_json( gameObjectBuffer,&currentPlayer);
-        tCount[in]++;
+        // memset(gameObjectBuffer, 0, BUFLEN);
+        // update_json( gameObjectBuffer,&currentPlayer);
+        // tCount[in]++;
     }
     fflush(stdout);
     return NULL;
 }
 
 int update_json(char* buffer, const Value *p) {
-    P(sem_id);
+
     FILE* fp = fopen("./gameObject.json", "r");
 
     StringBuffer outputBuffer;
@@ -184,11 +171,12 @@ int update_json(char* buffer, const Value *p) {
     strcpy(buffer, outputBuffer.GetString());
 
     fclose(fp);
-    V(sem_id);
+
 }
 
 int main (int argc, char **argv)
 {
+    
 	int	sd, new_sd, client_len, port;
 	struct	sockaddr_in server, client;
     struct epoll_event tcpEvent, events[MAX_EVENTS];
@@ -199,26 +187,12 @@ int main (int argc, char **argv)
     int tcpSockets[MAX_CLIENTS];
 
     pthread_t tid[MAX_CLIENTS];
-    tStruct* infoArray[MAX_CLIENTS];
     char readBuffer[BUFLEN];
     char writeBuffer[BUFLEN];
 
     memset(tCount, 0, (MAX_CLIENTS * sizeof(int)));
 
-    //Initialize circular buffer
-    updates = (struct circular*)malloc(sizeof(struct circular));
-    memset(updates, 0, sizeof(struct circular));
-    updates->writeIndex = 0;
-    updates->readIndex =0;
-    updates->bufferLength = 0;
-    updates->updateCount = 0;
-
-    //initialize infoArray
-    for(int i = 0; i < MAX_CLIENTS; i++) {
-        infoArray[i] = new tStruct;
-    }
-
-	switch(argc)
+    switch(argc)
 	{
 		case 1:
 			port = SERVER_TCP_PORT;	// Use the default port
@@ -231,27 +205,24 @@ int main (int argc, char **argv)
 			exit(1);
     }
 
-    //Init semaphore
-    if((sem_id = init_semaphore(sem_id, (key_t)200)) == -1) {
-        perror("init_semphore");
-    }
-    V(sem_id);
+    //Initialize circular buffer
+    updates = (struct circular*)malloc(sizeof(struct circular));
+    memset(updates, 0, sizeof(struct circular));
+    updates->writeIndex = 0;
+    updates->readIndex =0;
+    updates->bufferLength = 0;
+    updates->updateCount = 0;
 
-    if((circular_sem = init_semaphore(sem_id, (key_t)12323)) == -1) {
-        perror("init circular semaphore");
-    }
+    if (pthread_mutex_init(&circularBufferLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+        return 1; 
+    } 
 
-    if((pid = fork()) == -1) {
-        perror("Fork");
-    }
-
-    if(pid == 0) {
-        while(true) {
-            P(circular_sem);
-            read_buffer();
-        }
-    }
-
+    //Init semaphores
+    
+    sem_init(&countsem, 0, 0);
+    sem_init(&spacesem, 0, MAX_CLIENTS);
+    
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
     const int j = 0;
@@ -300,9 +271,6 @@ int main (int argc, char **argv)
             exit(1);
         }
         
-        infoArray[numOfClients]->tcpSocket = tcpSockets[numOfClients];
-        //infoArray[numOfClients]->tcpSocket = udpSockets[numOfClients];
-        infoArray[numOfClients]->clientNo = numOfClients;
         //send udpport to client
         int client_number = numOfClients;
         printf("Client number: %d" , client_number);
@@ -361,86 +329,28 @@ int main (int argc, char **argv)
     kill(pid, SIGINT);
     printf("Update Count: %d\n", updates->updateCount);
     close(sd);
-    if(remove_semaphore(sem_id) == -1) {
+    if(sem_destroy(&countsem) == -1) {
+        perror("Error removing semaphore");
+    }
+    if(sem_destroy(&spacesem) == -1) {
         perror("Error removing semaphore");
     }
 	return(0);
 }
 
 int write_buffer(char* buffer) {
-    V(circular_sem);
-    strcpy(updates->buffer[updates->writeIndex], buffer);
-    set_wIndex();
+    sem_wait(&spacesem);
+    pthread_mutex_lock(&circularBufferLock);
+    strcpy(updates->buffer[(updates->writeIndex++) & (MAX_CLIENTS -1)], buffer);
+    pthread_mutex_unlock(&circularBufferLock);
+    sem_post(&countsem);
 }
-//This function should update the JSON
+
 int read_buffer() {
-    printf("start of read_buffer");
-    //ADD STUFF FOR UPDATING JSON FILE HERE
-
-    //Increment variable after updating file
-    updates->updateCount++;
-    memset(updates->buffer[updates->readIndex], 0, BUFLEN);
-    set_rIndex();
-}
-void set_wIndex() {
-    if(updates->writeIndex == (MAX_CLIENTS - 1)) {
-        updates->writeIndex = 0;
-    } else {
-        updates->writeIndex++;
-    }
-}
-void set_rIndex() {
-    if(updates->readIndex == (MAX_CLIENTS -1)) {
-        updates->readIndex = 0;
-    } else {
-        updates->readIndex++;
-    }
-}
-
-int init_semaphore(int sem_id, key_t key) {
-    int status=0;
-
-    if ((sem_id = semget((key_t)key, 1, 0666|IPC_CREAT|IPC_EXCL)) == -1)
-    {
-        if (errno == EEXIST)
-        sem_id = semget ((key_t)key, 1, 0);
-    }
-    else   /* if created */
-        status = semctl (sem_id, 0, SETVAL, 0);
-    if ((sem_id == -1) || status == -1)
-    {
-        perror ("initsem failed\n");
-        return (-1);
-    }
-    else
-        return (sem_id);
-}
-
-void P(int sem_id) {
- 
-    struct sembuf *sembuf_ptr;
-        
-    sembuf_ptr= (struct sembuf *) malloc (sizeof (struct sembuf *) );
-    sembuf_ptr->sem_num = 0;
-    sembuf_ptr->sem_op = -1;
-    sembuf_ptr->sem_flg = SEM_UNDO;
-
-    if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error P\n");
-}
-
-void V(int sem_id) {
-struct sembuf *sembuf_ptr;
-        
-    sembuf_ptr= (struct sembuf *) malloc (sizeof (struct sembuf *) );
-    sembuf_ptr->sem_num = 0;
-    sembuf_ptr->sem_op = 1;
-    sembuf_ptr->sem_flg = SEM_UNDO;
-
-    if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error V\n");
-}
-
-int remove_semaphore(int sem_id) {
-    return(semctl(sem_id, IPC_RMID, 0));
+    char readBuffer[BUFLEN];
+    sem_wait(&countsem);
+    pthread_mutex_lock(&circularBufferLock);
+    strcpy(readBuffer, updates->buffer[(updates->readIndex++) & (MAX_CLIENTS -1)]);
+    pthread_mutex_unlock(&circularBufferLock);
+    sem_post(&spacesem);
 }
