@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 2
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -291,7 +291,8 @@ int main (int argc, char **argv)
         }
     }
 
-printf("\n\n GAME OBJECT: %s", outputBuffer.GetString());
+    printf("\n\n GAME OBJECT: %s", gameStateBuffer);
+    printf("\n UDPATED: %d", updates->updateCount);
     for(int i = 0; i < MAX_CLIENTS; i++) {
             printf("%d\t%d\n", i, tCount[i]);
     }
@@ -316,7 +317,10 @@ printf("\n\n GAME OBJECT: %s", outputBuffer.GetString());
 int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
-    int index = (updates->writeIndex++) & (MAX_CLIENTS -1);
+    int index = updates->writeIndex++;
+    if (index >= MAX_CLIENTS) {
+        index = 0;
+    }
     printf("write index: %d\n", index);
     strcpy(updates->buffer[index], buffer);
     pthread_mutex_unlock(&circularBufferLock);
@@ -334,7 +338,10 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
-        int index = (updates->readIndex++) & (MAX_CLIENTS -1);
+        int index = updates->readIndex++;
+        if (index >= MAX_CLIENTS) {
+            index = 0;
+        }
         printf("read index: %d\n", index);
         strcpy(readBuffer, updates->buffer[index & (MAX_CLIENTS -1)]);
         pthread_mutex_unlock(&circularBufferLock);
@@ -343,14 +350,13 @@ void * read_buffer(void *t_info) {
         //parse read string to json object 
         Document received;
         received.Parse(readBuffer);
-        Value& players = received["players"];
-        Value& updatedPlayer = players[0];
+        Value& updatedPlayer = received["players"][0];
         int id = updatedPlayer["id"].GetInt();
-        printf("index: %d\n", id);
+        printf("player id: %d\n", id);
         int xCoord = updatedPlayer["x"].GetInt();
         
-        Value &playerObject = player_stats[id];
-	    playerObject = updatedPlayer;
+        //Value &playerObject = player_stats[id];
+	    player_stats[id]["x"] = xCoord;
 
         //something happens (a count or time) 
         memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
@@ -359,7 +365,8 @@ void * read_buffer(void *t_info) {
     
 	    gameState.Accept(writer);
         //printf("%s\n\n\n", outputBuffer.GetString());
-        //strcpy(gameStateBuffer, outputBuffer.GetString());
+        strcpy(gameStateBuffer, outputBuffer.GetString());
+        updates->updateCount++;
 
         //outputBuffer now contains updated game object as json string
         //blast out update

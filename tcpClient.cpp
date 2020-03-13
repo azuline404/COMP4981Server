@@ -219,7 +219,7 @@ int main (int argc, char **argv)
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-	for(int i = 0; i < 100; i++) {
+	for(int i = 0; i < 1000; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);
