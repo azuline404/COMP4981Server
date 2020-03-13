@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 16
+#define MAX_CLIENTS 4
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -60,7 +60,6 @@ struct circular {
     		       should equal the total # of messages received*/
     char buffer[MAX_CLIENTS][BUFLEN];
 };
-pthread_mutex_t circularBufferLock;
 
 
 /*-----------Function prototypes-----------*/
@@ -68,7 +67,7 @@ pthread_mutex_t circularBufferLock;
 int update_json(char* buffer, const Value *p);
 //Circular buffer functions
 int write_buffer(char* buffer);
-int read_buffer();
+void * read_buffer(void *t_info);
 void set_wIndex();
 void set_rIndex();
 void print_buffer();
@@ -77,10 +76,15 @@ void print_buffer();
 //Semaphore ID's
 sem_t countsem, spacesem;
 
+//Global game state object
+Document gameState;
 
 int tCount[MAX_CLIENTS] = {0};
 volatile int UDP_PORT = 12500;
 struct circular* updates;
+pthread_mutex_t circularBufferLock;
+StringBuffer outputBuffer;
+char gameStateBuffer[GAME_OBJECT_BUFFER];
 
 void * clientThread(void *t_info)
 {
@@ -91,7 +95,6 @@ void * clientThread(void *t_info)
     int port_number = PORT_START + in;
     int udpSocket;
     char writeBuffer[BUFLEN];
-    char gameObjectBuffer[GAME_OBJECT_BUFFER];
     char readBuffer[BUFLEN];
     struct sockaddr_in udpServer;
     memset(&udpServer, 0, sizeof(udpServer));
@@ -124,54 +127,21 @@ void * clientThread(void *t_info)
             printf("didnt recieve anything, recv error");
             exit(1);
         }
-        fflush(stdout);
-
-        // char * tempBuf = readBuffer;
-        // write_buffer(readBuffer);
-
-        // Document playerDocument;
-        // playerDocument.Parse(tempBuf);
-        // Value& players = playerDocument["players"];
-        // const Value& currentPlayer = players[0];
-            
-        // memset(gameObjectBuffer, 0, BUFLEN);
-        // update_json( gameObjectBuffer,&currentPlayer);
-        // tCount[in]++;
+        printf("received no: %d", tCount[in]++);
+        write_buffer(readBuffer);
     }
     fflush(stdout);
     return NULL;
 }
 
-int update_json(char* buffer, const Value *p) {
-
+void init_gameState() {
     FILE* fp = fopen("./gameObject.json", "r");
-
-    StringBuffer outputBuffer;
 
     char buff[65536];
     FileReadStream is(fp, buff, sizeof(buff));
 
-    Document d;
-    d.ParseStream(is);
-
-    Value & serverPlayers = d["players"];
-
-    int id = (*p)["id"].GetInt();
-    int xCoord = (*p)["x"].GetInt();
-	Value & playerObject = serverPlayers[id];
-	playerObject["x"].SetInt(xCoord);
-
-	Writer<StringBuffer> writer(outputBuffer);
-	d.Accept(writer);
+    gameState.ParseStream(is);
     fclose(fp);
-    fp = fopen("./gameObject.json", "w");
-    FileWriteStream os(fp, (char*)outputBuffer.GetString(), 65536);
-    Writer<FileWriteStream> writer2(os);
-    d.Accept(writer2);
-    strcpy(buffer, outputBuffer.GetString());
-
-    fclose(fp);
-
 }
 
 int main (int argc, char **argv)
@@ -186,7 +156,7 @@ int main (int argc, char **argv)
     int pid;
     int tcpSockets[MAX_CLIENTS];
 
-    pthread_t tid[MAX_CLIENTS];
+    pthread_t tid[MAX_CLIENTS+1];
     char readBuffer[BUFLEN];
     char writeBuffer[BUFLEN];
 
@@ -296,6 +266,9 @@ int main (int argc, char **argv)
             break;
         }
 	}
+    if( pthread_create(&tid[numOfClients], NULL, read_buffer, NULL) != 0 ) {
+           printf("Failed to create thread\n");
+    }
 
     int numStopped = 0;
     while(true) {
@@ -318,6 +291,7 @@ int main (int argc, char **argv)
         }
     }
 
+printf("\n\n GAME OBJECT: %s", outputBuffer.GetString());
     for(int i = 0; i < MAX_CLIENTS; i++) {
             printf("%d\t%d\n", i, tCount[i]);
     }
@@ -326,8 +300,7 @@ int main (int argc, char **argv)
         printf("Client #: %d\t%d\n", x, tCount[x]);
         close(tcpSockets[x]);
     }
-    kill(pid, SIGINT);
-    printf("Update Count: %d\n", updates->updateCount);
+
     close(sd);
     if(sem_destroy(&countsem) == -1) {
         perror("Error removing semaphore");
@@ -335,22 +308,63 @@ int main (int argc, char **argv)
     if(sem_destroy(&spacesem) == -1) {
         perror("Error removing semaphore");
     }
+
+    kill(pid, SIGINT);
 	return(0);
 }
 
 int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
-    strcpy(updates->buffer[(updates->writeIndex++) & (MAX_CLIENTS -1)], buffer);
+    int index = (updates->writeIndex++) & (MAX_CLIENTS -1);
+    printf("write index: %d\n", index);
+    strcpy(updates->buffer[index], buffer);
     pthread_mutex_unlock(&circularBufferLock);
     sem_post(&countsem);
 }
 
-int read_buffer() {
+void * read_buffer(void *t_info) {
+    init_gameState();
+    Value &player_stats = gameState["players"];
     char readBuffer[BUFLEN];
-    sem_wait(&countsem);
-    pthread_mutex_lock(&circularBufferLock);
-    strcpy(readBuffer, updates->buffer[(updates->readIndex++) & (MAX_CLIENTS -1)]);
-    pthread_mutex_unlock(&circularBufferLock);
-    sem_post(&spacesem);
+
+    while(true) {
+        memset(readBuffer, 0, sizeof(readBuffer));
+
+        //read json string from circular buffer
+        sem_wait(&countsem);
+        pthread_mutex_lock(&circularBufferLock);
+        int index = (updates->readIndex++) & (MAX_CLIENTS -1);
+        printf("read index: %d\n", index);
+        strcpy(readBuffer, updates->buffer[index & (MAX_CLIENTS -1)]);
+        pthread_mutex_unlock(&circularBufferLock);
+        sem_post(&spacesem);
+        //printf("outside mutex and sem\n");
+        //parse read string to json object 
+        Document received;
+        received.Parse(readBuffer);
+        Value& players = received["players"];
+        Value& updatedPlayer = players[0];
+        int id = updatedPlayer["id"].GetInt();
+        printf("index: %d\n", id);
+        int xCoord = updatedPlayer["x"].GetInt();
+        
+        Value &playerObject = player_stats[id];
+	    playerObject = updatedPlayer;
+
+        //something happens (a count or time) 
+        memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
+        outputBuffer.Clear();
+	    Writer<StringBuffer> writer(outputBuffer);
+    
+	    gameState.Accept(writer);
+        //printf("%s\n\n\n", outputBuffer.GetString());
+        //strcpy(gameStateBuffer, outputBuffer.GetString());
+
+        //outputBuffer now contains updated game object as json string
+        //blast out update
+    }
 }
+
+
+
