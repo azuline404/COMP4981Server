@@ -278,9 +278,7 @@ int main (int argc, char **argv)
             //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
             n = recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
             if((strcmp(readBuffer, "stop")) == 0) {
-                printf("\n\nclient %d: stop received\n with count %d\n", events[i].data.fd, tCount[1]);
                 fflush(stdout);
-                
                 numStopped++;
                 break;
             }
@@ -297,7 +295,7 @@ int main (int argc, char **argv)
     // }
     Value &player_stats = gameState["players"];
     for (int x = 0; x < MAX_CLIENTS; x++) {
-        printf("Player x value: %d\n", player_stats[x].GetInt());
+        printf("Player x value: %d\n", player_stats[x]["x"].GetInt());
     }
 
     for(int x = 0; x < MAX_CLIENTS; x++) {
