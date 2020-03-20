@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 2
+#define MAX_CLIENTS 4
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -345,6 +345,7 @@ void * read_buffer(void *t_info) {
         }
         printf("read index: %d\n", index);
         strcpy(readBuffer, updates->buffer[index & (MAX_CLIENTS -1)]);
+        tCount[id]++;
         pthread_mutex_unlock(&circularBufferLock);
         sem_post(&spacesem);
         //printf("outside mutex and sem\n");
@@ -353,7 +354,6 @@ void * read_buffer(void *t_info) {
         received.Parse(readBuffer);
         Value& updatedPlayer = received["players"][0];
         int id = updatedPlayer["id"].GetInt();
-        tCount[id]++;
         //printf("received no: %d", tCount[in]++);
         int xCoord = updatedPlayer["x"].GetInt();
         
