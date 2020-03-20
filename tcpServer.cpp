@@ -110,6 +110,7 @@ void * clientThread(void *t_info)
     if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
         perror("SET SOCK OPT FAILED");
     };
+
     if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
     {
         perror("Can't bind name to socket");
@@ -127,7 +128,7 @@ void * clientThread(void *t_info)
             printf("didnt recieve anything, recv error");
             exit(1);
         }
-        printf("received no: %d", tCount[in]++);
+        //printf("received no: %d", tCount[in]++);
         write_buffer(readBuffer);
     }
     fflush(stdout);
@@ -243,16 +244,14 @@ int main (int argc, char **argv)
         
         //send udpport to client
         int client_number = numOfClients;
-        printf("Client number: %d" , client_number);
 
-        printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
         if( pthread_create(&tid[numOfClients], NULL, clientThread, &client_number) != 0 ) {
            printf("Failed to create thread\n");
         }
         UDP_PORT++;
         numOfClients++;
         if(numOfClients == MAX_CLIENTS) {
-            printf("MAX CLIENT AT: %d\n", numOfClients);
+            // printf("MAX CLIENT AT: %d\n", numOfClients);
             fflush(stdout);
             //signal all clients to start sending
             for(int i = 0; i < numOfClients; i++) {
@@ -291,10 +290,14 @@ int main (int argc, char **argv)
         }
     }
 
-    printf("\n\n GAME OBJECT: %s", gameStateBuffer);
-    printf("\n UDPATED: %d", updates->updateCount);
-    for(int i = 0; i < MAX_CLIENTS; i++) {
-            printf("%d\t%d\n", i, tCount[i]);
+    // printf("\n\n GAME OBJECT: %s", gameStateBuffer);
+    // printf("\n UDPATED: %d", updates->updateCount);
+    // for(int i = 0; i < MAX_CLIENTS; i++) {
+    //         printf("%d\t%d\n", i, tCount[i]);
+    // }
+    Value &player_stats = gameState["players"];
+    for (int x = 0; x < MAX_CLIENTS; x++) {
+        printf("Player x value: %d\n", player_stats[x].GetInt());
     }
 
     for(int x = 0; x < MAX_CLIENTS; x++) {
@@ -352,7 +355,8 @@ void * read_buffer(void *t_info) {
         received.Parse(readBuffer);
         Value& updatedPlayer = received["players"][0];
         int id = updatedPlayer["id"].GetInt();
-        printf("player id: %d\n", id);
+        tCount[id]++;
+        //printf("received no: %d", tCount[in]++);
         int xCoord = updatedPlayer["x"].GetInt();
         
         //Value &playerObject = player_stats[id];
