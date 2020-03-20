@@ -345,15 +345,14 @@ void * read_buffer(void *t_info) {
         }
         printf("read index: %d\n", index);
         strcpy(readBuffer, updates->buffer[index & (MAX_CLIENTS -1)]);
-        tCount[id]++;
-        pthread_mutex_unlock(&circularBufferLock);
-        sem_post(&spacesem);
-        //printf("outside mutex and sem\n");
-        //parse read string to json object 
         Document received;
         received.Parse(readBuffer);
         Value& updatedPlayer = received["players"][0];
         int id = updatedPlayer["id"].GetInt();
+        tCount[id]++;
+        //printf("outside mutex and sem\n");
+        //parse read string to json object 
+    
         //printf("received no: %d", tCount[in]++);
         int xCoord = updatedPlayer["x"].GetInt();
         
@@ -369,7 +368,8 @@ void * read_buffer(void *t_info) {
         //printf("%s\n\n\n", outputBuffer.GetString());
         strcpy(gameStateBuffer, outputBuffer.GetString());
         updates->updateCount++;
-
+        pthread_mutex_unlock(&circularBufferLock);
+        sem_post(&spacesem);
         //outputBuffer now contains updated game object as json string
         //blast out update
     }
