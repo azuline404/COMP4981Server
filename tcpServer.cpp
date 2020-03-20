@@ -358,7 +358,7 @@ void * read_buffer(void *t_info) {
         
         //Value &playerObject = player_stats[id];
 	    player_stats[id]["x"] = xCoord;
-
+        printf("player %d: %d\n", id, xCoord);
         //something happens (a count or time) 
         memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
         outputBuffer.Clear();
