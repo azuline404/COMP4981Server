@@ -193,7 +193,7 @@ int main (int argc, char **argv)
     
     sem_init(&countsem, 0, 0);
     sem_init(&writeIndex, 0, 1);
-    sem_init(&spacesem, 0, MAX_CLIENTS);
+    sem_init(&spacesem, 0, 1);
     
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
@@ -322,12 +322,12 @@ int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
     //only one thread at a time can read and modify write index
-    sem_wait(&writeIndex);
+   // sem_wait(&writeIndex);
     int index = updates->writeIndex++;
     if (index >= (MAX_CLIENTS)) {
         index = 0;
     }
-    sem_post(&writeIndex);
+    //sem_post(&writeIndex);
     printf("write index: %d\n", index);
     strcpy(updates->buffer[index], buffer);
     pthread_mutex_unlock(&circularBufferLock);
