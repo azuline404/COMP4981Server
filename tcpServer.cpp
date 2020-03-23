@@ -344,7 +344,7 @@ void * read_buffer(void *t_info) {
             index = 0;
         }
         printf("read index: %d\n", index);
-        strcpy(readBuffer, updates->buffer[index & (MAX_CLIENTS -1)]);
+        strcpy(readBuffer, updates->buffer[index]);
         Document received;
         received.Parse(readBuffer);
         Value& updatedPlayer = received["players"][0];
