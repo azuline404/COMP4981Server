@@ -327,7 +327,7 @@ int write_buffer(char* buffer) {
     if (index >= (MAX_CLIENTS)) {
         index = 0;
     }
-    sem_post(&writeIndex)
+    sem_post(&writeIndex);
     printf("write index: %d\n", index);
     strcpy(updates->buffer[index], buffer);
     pthread_mutex_unlock(&circularBufferLock);
