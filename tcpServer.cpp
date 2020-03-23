@@ -353,13 +353,16 @@ void * read_buffer(void *t_info) {
         strcpy(readBuffer, updates->buffer[index]);
         Document received;
         received.Parse(readBuffer);
+        printf("before updatedPlayer\n");
         Value& updatedPlayer = received["players"][0];
+        printf("before id\n");
         int id = updatedPlayer["id"].GetInt();
         tCount[id]++;
         //printf("outside mutex and sem\n");
         //parse read string to json object 
     
         //printf("received no: %d", tCount[in]++);
+        printf("before xCoord\n");
         int xCoord = updatedPlayer["x"].GetInt();
         
         //Value &playerObject = player_stats[id];
