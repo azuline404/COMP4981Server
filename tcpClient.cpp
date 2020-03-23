@@ -42,7 +42,7 @@
 
 #define SERVER_TCP_PORT		7000	// Default port
 #define BUFLEN			3500  	// Buffer length
-
+#define SEND_COUNT 10
 using namespace rapidjson;
 
 
@@ -219,7 +219,7 @@ int main (int argc, char **argv)
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-	for(int i = 0; i < 1000; i++) {
+	for(int i = 0; i < SEND_COUNT; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);

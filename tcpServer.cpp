@@ -58,7 +58,7 @@ struct circular {
     int bufferLength; /*can possibly be replaced with semaphore?*/
     int updateCount; /*temp variable to check if read_buffer() running as intended,
     		       should equal the total # of messages received*/
-    char buffer[MAX_CLIENTS][BUFLEN];
+    char buffer[MAX_CLIENTS*2][BUFLEN];
 };
 
 
@@ -319,7 +319,7 @@ int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
     int index = updates->writeIndex++;
-    if (index >= MAX_CLIENTS) {
+    if (index >= (MAX_CLIENTS * 2)) {
         index = 0;
     }
     printf("write index: %d\n", index);
@@ -340,7 +340,7 @@ void * read_buffer(void *t_info) {
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
         int index = updates->readIndex++;
-        if (index >= MAX_CLIENTS) {
+        if (index >= (MAX_CLIENTS * 2)) {
             index = 0;
         }
         printf("read index: %d\n", index);
