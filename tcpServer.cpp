@@ -58,7 +58,7 @@ struct circular {
     int bufferLength; /*can possibly be replaced with semaphore?*/
     int updateCount; /*temp variable to check if read_buffer() running as intended,
     		       should equal the total # of messages received*/
-    char buffer[MAX_CLIENTS*2][BUFLEN];
+    char buffer[MAX_CLIENTS][BUFLEN];
 };
 
 
@@ -74,7 +74,7 @@ void print_buffer();
 
 
 //Semaphore ID's
-sem_t countsem, spacesem;
+sem_t countsem, spacesem, writeIndex;
 
 //Global game state object
 Document gameState;
@@ -192,6 +192,7 @@ int main (int argc, char **argv)
     //Init semaphores
     
     sem_init(&countsem, 0, 0);
+    sem_init(&writeIndex, 1);
     sem_init(&spacesem, 0, MAX_CLIENTS);
     
 	// Create a stream socket
@@ -310,7 +311,9 @@ int main (int argc, char **argv)
     if(sem_destroy(&spacesem) == -1) {
         perror("Error removing semaphore");
     }
-
+    if(sem_destroy(&writeIndex) == -1) {
+        perror("Error removing semaphore");
+    }
     kill(pid, SIGINT);
 	return(0);
 }
@@ -318,10 +321,13 @@ int main (int argc, char **argv)
 int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
+    //only one thread at a time can read and modify write index
+    sem_wait(&writeIndex)
     int index = updates->writeIndex++;
-    if (index >= (MAX_CLIENTS * 2)) {
+    if (index >= (MAX_CLIENTS)) {
         index = 0;
     }
+    sem_post(&writeIndex)
     printf("write index: %d\n", index);
     strcpy(updates->buffer[index], buffer);
     pthread_mutex_unlock(&circularBufferLock);
@@ -340,7 +346,7 @@ void * read_buffer(void *t_info) {
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
         int index = updates->readIndex++;
-        if (index >= (MAX_CLIENTS * 2)) {
+        if (index >= (MAX_CLIENTS)) {
             index = 0;
         }
         printf("read index: %d\n", index);
