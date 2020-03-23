@@ -322,7 +322,7 @@ int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
     //only one thread at a time can read and modify write index
-    sem_wait(&writeIndex)
+    sem_wait(&writeIndex);
     int index = updates->writeIndex++;
     if (index >= (MAX_CLIENTS)) {
         index = 0;
