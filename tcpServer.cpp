@@ -192,7 +192,7 @@ int main (int argc, char **argv)
     //Init semaphores
     
     sem_init(&countsem, 0, 0);
-    sem_init(&writeIndex, 1);
+    sem_init(&writeIndex, 0, 1);
     sem_init(&spacesem, 0, MAX_CLIENTS);
     
 	// Create a stream socket
