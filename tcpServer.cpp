@@ -323,13 +323,12 @@ int write_buffer(char* buffer) {
     pthread_mutex_lock(&circularBufferLock);
     //only one thread at a time can read and modify write index
    // sem_wait(&writeIndex);
-    int index = updates->writeIndex++;
-    if (index >= (MAX_CLIENTS)) {
-        index = 0;
+    if (updates->writeIndex++ >= MAX_CLIENTS) {
+        updates->writeIndex = 0;
     }
     //sem_post(&writeIndex);
-    printf("write index: %d\n", index);
-    strcpy(updates->buffer[index], buffer);
+    printf("write index: %d\n",  updates->writeIndex);
+    strcpy(updates->buffer[ updates->writeIndex], buffer);
     pthread_mutex_unlock(&circularBufferLock);
     sem_post(&countsem);
 }
@@ -345,12 +344,11 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
-        int index = updates->readIndex++;
-        if (index >= (MAX_CLIENTS)) {
-            index = 0;
+        if (updates->readIndex++ >= (MAX_CLIENTS)) {
+            updates->readIndex= 0;
         }
-        printf("read index: %d\n", index);
-        strcpy(readBuffer, updates->buffer[index]);
+        printf("read index: %d\n", updates->readIndex++);
+        strcpy(readBuffer, updates->buffer[updates->readIndex++]);
         Document received;
         received.Parse(readBuffer);
         printf("before updatedPlayer\n");
