@@ -74,7 +74,7 @@ void print_buffer();
 
 
 //Semaphore ID's
-sem_t countsem, spacesem, writeIndex;
+sem_t countsem, spacesem, writeIndex, readIndex;
 
 //Global game state object
 Document gameState;
@@ -83,6 +83,8 @@ int tCount[MAX_CLIENTS] = {0};
 volatile int UDP_PORT = 12500;
 struct circular* updates;
 pthread_mutex_t circularBufferLock;
+pthread_mutex_t writeIndexLock;
+pthread_mutex_t readIndexLock;
 StringBuffer outputBuffer;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
 
@@ -188,12 +190,21 @@ int main (int argc, char **argv)
         printf("\n mutex init has failed\n"); 
         return 1; 
     } 
+    if (pthread_mutex_init(&writeIndexLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+        return 1; 
+    } 
+    if (pthread_mutex_init(&readIndexLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+        return 1; 
+    } 
 
     //Init semaphores
     
     sem_init(&countsem, 0, 0);
     sem_init(&writeIndex, 0, 1);
-    sem_init(&spacesem, 0, 1);
+    sem_init(&readIndex, 0, 1);
+    sem_init(&spacesem, 0, MAX_CLIENTS);
     
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
@@ -322,15 +333,17 @@ int write_buffer(char* buffer) {
     sem_wait(&spacesem);
     pthread_mutex_lock(&circularBufferLock);
     //only one thread at a time can read and modify write index
-   // sem_wait(&writeIndex);
+   sem_wait(&writeIndex);
+   pthread_mutex_lock(&writeIndexLock);
     if (++updates->writeIndex >= MAX_CLIENTS) {
         printf("resetting write index to 0\n");
         updates->writeIndex = 0;
     }
-    //sem_post(&writeIndex);
+    pthread_mutex_unlock(&writeIndexLock);
+    sem_post(&writeIndex);
+    pthread_mutex_unlock(&circularBufferLock);
     printf("write index: %d\n",  updates->writeIndex);
     strcpy(updates->buffer[ updates->writeIndex], buffer);
-    pthread_mutex_unlock(&circularBufferLock);
     sem_post(&countsem);
 }
 
@@ -345,10 +358,14 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
+        sem_wait(&readIndex);
+        pthread_mutex_lock(&readIndexLock);
         if (++updates->readIndex >= (MAX_CLIENTS)) {
             printf("resetting read index to 0\n");
             updates->readIndex= 0;
         }
+        pthread_mutex_unlock(&readIndexLock);
+        sem_post(&readIndex);
         printf("read index: %d\n", updates->readIndex);
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
