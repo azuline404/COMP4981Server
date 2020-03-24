@@ -323,7 +323,7 @@ int write_buffer(char* buffer) {
     pthread_mutex_lock(&circularBufferLock);
     //only one thread at a time can read and modify write index
    // sem_wait(&writeIndex);
-    if (updates->writeIndex++ >= MAX_CLIENTS) {
+    if (++updates->writeIndex >= MAX_CLIENTS) {
         printf("resetting write index to 0\n");
         updates->writeIndex = 0;
     }
@@ -345,7 +345,7 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
-        if (updates->readIndex++ >= (MAX_CLIENTS)) {
+        if (++updates->readIndex >= (MAX_CLIENTS)) {
             printf("resetting read index to 0\n");
             updates->readIndex= 0;
         }
