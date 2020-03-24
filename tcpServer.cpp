@@ -114,7 +114,6 @@ void * clientThread(void *t_info)
     char writeBuffer[BUFLEN];
     char readBuffer[BUFLEN];
     struct sockaddr_in udpServer, udpClient;
-    int len = sizeof(udpClient);
     memset(&udpServer, 0, sizeof(udpServer));
     memset(&udpClient, 0, sizeof(udpClient));
     udpServer.sin_family = AF_INET;
@@ -135,7 +134,7 @@ void * clientThread(void *t_info)
         perror("Can't bind name to socket");
         exit(1);
     }
-
+    int len = sizeof(*clientAddresses[in]);
     int n;
     int sentCount = 0;
     bool first = true;
@@ -143,7 +142,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &sizeof(*clientAddresses[in])));
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &len);
         if (n < 0) {
             perror("didnt recieve anything, recv error");
             exit(1);
