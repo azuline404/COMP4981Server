@@ -347,7 +347,7 @@ void * read_buffer(void *t_info) {
         if (updates->readIndex++ >= (MAX_CLIENTS)) {
             updates->readIndex= 0;
         }
-        printf("read index: %d\n", updates->readIndex++);
+        printf("read index: %d\n", updates->readIndex);
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
         received.Parse(readBuffer);
