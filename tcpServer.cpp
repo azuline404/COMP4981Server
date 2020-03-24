@@ -111,6 +111,7 @@ void * clientThread(void *t_info)
     char writeBuffer[BUFLEN];
     char readBuffer[BUFLEN];
     struct sockaddr_in udpServer, udpClient;
+    int len = sizeof(udpClient);
     memset(&udpServer, 0, sizeof(udpServer));
     memset(&udpClient, 0, sizeof(udpClient));
     udpServer.sin_family = AF_INET;
@@ -138,7 +139,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t*)sizeof(udpClient));
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, &len);
         if (n < 0) {
             perror("didnt recieve anything, recv error");
             exit(1);
