@@ -212,16 +212,12 @@ int main (int argc, char **argv)
         printf("\n mutex init has failed\n"); 
         return 1; 
     } 
-    if (pthread_mutex_init(&readIndexLock, NULL) != 0) { 
-        printf("\n mutex init has failed\n"); 
-        return 1; 
-    } 
+
 
     //Init semaphores
     
     sem_init(&countsem, 0, 0);
     sem_init(&writeIndex, 0, 1);
-    sem_init(&readIndex, 0, 1);
     sem_init(&spacesem, 0, MAX_CLIENTS);
     
 	// Create a stream socket
