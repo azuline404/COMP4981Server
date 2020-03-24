@@ -376,14 +376,12 @@ void * read_buffer(void *t_info) {
         tCount[id]++;
         //printf("outside mutex and sem\n");
         //parse read string to json object 
-    
-        //printf("received no: %d", tCount[in]++);
-        printf("before xCoord\n");
-        int xCoord = updatedPlayer["x"].GetInt();
+
+        //int xCoord = updatedPlayer["x"].GetInt();
         
-        //Value &playerObject = player_stats[id];
-	    player_stats[id]["x"] = xCoord;
-        printf("player %d: %d\n", id, xCoord);
+        player_stats[id] = updatedPlayer;
+	    //player_stats[id]["x"] = xCoord;
+        //printf("player %d: %d\n", id, xCoord);
         //something happens (a count or time) 
         memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
         outputBuffer.Clear();
