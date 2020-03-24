@@ -143,7 +143,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t *) &len);
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &sizeof(*clientAddresses[in]));
         if (n < 0) {
             perror("didnt recieve anything, recv error");
             exit(1);
@@ -222,7 +222,10 @@ int main (int argc, char **argv)
         return 1; 
     } 
 
-
+    //set up client addresses array
+     for(int i = 0; i < MAX_CLIENTS; i++) {
+         clientAddresses[i] = new struct sockaddr_in;
+     }
     //Init semaphores
     
     sem_init(&countsem, 0, 0);
