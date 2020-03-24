@@ -95,7 +95,7 @@ void * send_updates(void * info) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < MAX_CLIENTS; i++) {
-            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], sizeof(&clientAddresses[i])) < 0) {
+            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], sizeof(*clientAddresses[i])) < 0) {
                 perror("send to\n");
 		    }
         }
