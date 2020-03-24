@@ -137,7 +137,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSockets[in], readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, sizeof(udpClient));
+        n = recvfrom(udpSockets[in], readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t*)sizeof(udpClient));
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
