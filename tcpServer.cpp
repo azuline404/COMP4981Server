@@ -89,7 +89,7 @@ char gameStateBuffer[GAME_OBJECT_BUFFER];
 int udpSockets[MAX_CLIENTS];
 struct sockaddr_in* clientAddresses[MAX_CLIENTS];
 
-void * send_updates() {
+void * send_updates(void * info) {
     int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     while(true) {
         char currentGameState[GAME_OBJECT_BUFFER];
