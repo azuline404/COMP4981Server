@@ -84,7 +84,6 @@ volatile int UDP_PORT = 12500;
 struct circular* updates;
 pthread_mutex_t circularBufferLock;
 pthread_mutex_t writeIndexLock;
-pthread_mutex_t readIndexLock;
 StringBuffer outputBuffer;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
 int udpSockets[MAX_CLIENTS];
@@ -134,7 +133,7 @@ void * clientThread(void *t_info)
     }
 
     int n;
-
+    int sentCount = 0;
     printf("starting client %d \n", in);
     while(true) {
 
@@ -151,6 +150,7 @@ void * clientThread(void *t_info)
         if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
             perror("send to\n");
 		}
+        printf("sent %d to client %d", ++sentCount, in);
     }
     fflush(stdout);
     return NULL;
@@ -381,42 +381,30 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
-        // sem_wait(&readIndex);
-        // pthread_mutex_lock(&readIndexLock);
+
         if (++updates->readIndex >= (MAX_CLIENTS)) {
-            printf("resetting read index to 0\n");
             updates->readIndex= 0;
         }
-        // pthread_mutex_unlock(&readIndexLock);
-        // sem_post(&readIndex);
-        printf("read index: %d\n", updates->readIndex);
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
         received.Parse(readBuffer);
         Value& updatedPlayer = received["players"][0];
         int id = updatedPlayer["id"].GetInt();
         tCount[id]++;
-        //printf("outside mutex and sem\n");
-        //parse read string to json object 
 
-        //int xCoord = updatedPlayer["x"].GetInt();
-        
         player_stats[id] = updatedPlayer;
-	    //player_stats[id]["x"] = xCoord;
-        //printf("player %d: %d\n", id, xCoord);
-        //something happens (a count or time) 
+
         memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
         outputBuffer.Clear();
 	    Writer<StringBuffer> writer(outputBuffer);
     
 	    gameState.Accept(writer);
-        //printf("%s\n\n\n", outputBuffer.GetString());
+
         strcpy(gameStateBuffer, outputBuffer.GetString());
         updates->updateCount++;
         pthread_mutex_unlock(&circularBufferLock);
         sem_post(&spacesem);
-        //outputBuffer now contains updated game object as json string
-        //blast out update
+
     }
 }
 
