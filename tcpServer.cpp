@@ -91,6 +91,7 @@ struct sockaddr_in* clientAddresses[MAX_CLIENTS];
 
 void * send_updates(void * info) {
     int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    int count = 0;
     while(true) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
@@ -99,6 +100,7 @@ void * send_updates(void * info) {
                 perror("send to\n");
 		    }
         }
+        printf("sent: %d \n ", count++);
     }
 }
 
@@ -359,13 +361,11 @@ int write_buffer(char* buffer) {
    sem_wait(&writeIndex);
    pthread_mutex_lock(&writeIndexLock);
     if (++updates->writeIndex >= MAX_CLIENTS) {
-        printf("resetting write index to 0\n");
         updates->writeIndex = 0;
     }
     pthread_mutex_unlock(&writeIndexLock);
     sem_post(&writeIndex);
     pthread_mutex_unlock(&circularBufferLock);
-    printf("write index: %d\n",  updates->writeIndex);
     strcpy(updates->buffer[ updates->writeIndex], buffer);
     sem_post(&countsem);
 
