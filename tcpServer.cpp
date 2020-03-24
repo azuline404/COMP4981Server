@@ -108,7 +108,6 @@ void * clientThread(void *t_info)
     int in = *index;
     printf("in: %d with port: %d\n", in, UDP_PORT);
     int port_number = PORT_START + in;
-    int udpSocket;
     char writeBuffer[BUFLEN];
     char readBuffer[BUFLEN];
     struct sockaddr_in udpServer, udpClient;
@@ -148,7 +147,6 @@ void * clientThread(void *t_info)
 
         //send client update
         if(sendto(udpSockets[i], gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
-            printf("client %d:",client_id);
             perror("send to\n");
 		}
     }
@@ -169,7 +167,7 @@ void init_gameState() {
 int main (int argc, char **argv)
 {
     
-	int	sd, new_sd, client_len, port;
+	int	sd, client_len, port;
 	struct	sockaddr_in server, client;
     struct epoll_event tcpEvent, events[MAX_EVENTS];
     int epoll_fd;
@@ -252,7 +250,6 @@ int main (int argc, char **argv)
 
 	// queue up to 5 connect requests
 	listen(sd, 5);
-    int i = 0;
     int numOfClients = 0;
 	while (true)
 	{
