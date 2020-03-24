@@ -147,10 +147,10 @@ void * clientThread(void *t_info)
         write_buffer(readBuffer);
 
         //send client update
-        if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
-            perror("send to\n");
-		}
-        printf("sent %d to client %d\n", ++sentCount, in);
+        // if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
+        //     perror("send to\n");
+		// }
+        //printf("sent %d to client %d\n", ++sentCount, in);
     }
     fflush(stdout);
     return NULL;
