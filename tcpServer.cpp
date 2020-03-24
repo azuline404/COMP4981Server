@@ -150,7 +150,7 @@ void * clientThread(void *t_info)
         if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
             perror("send to\n");
 		}
-        printf("sent %d to client %d", ++sentCount, in);
+        printf("sent %d to client %d\n", ++sentCount, in);
     }
     fflush(stdout);
     return NULL;
