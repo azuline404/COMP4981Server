@@ -359,14 +359,14 @@ void * read_buffer(void *t_info) {
         //read json string from circular buffer
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
-        sem_wait(&readIndex);
-        pthread_mutex_lock(&readIndexLock);
+        // sem_wait(&readIndex);
+        // pthread_mutex_lock(&readIndexLock);
         if (++updates->readIndex >= (MAX_CLIENTS)) {
             printf("resetting read index to 0\n");
             updates->readIndex= 0;
         }
-        pthread_mutex_unlock(&readIndexLock);
-        sem_post(&readIndex);
+        // pthread_mutex_unlock(&readIndexLock);
+        // sem_post(&readIndex);
         printf("read index: %d\n", updates->readIndex);
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
