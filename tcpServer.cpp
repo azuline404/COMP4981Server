@@ -101,6 +101,7 @@ void * send_updates(void * info) {
 		    }
         }
         printf("sent: %d \n ", count++);
+        usleep(30000);
     }
 }
 
