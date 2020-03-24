@@ -143,7 +143,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &sizeof(*clientAddresses[in]));
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &sizeof(*clientAddresses[in])));
         if (n < 0) {
             perror("didnt recieve anything, recv error");
             exit(1);
