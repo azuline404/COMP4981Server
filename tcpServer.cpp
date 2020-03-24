@@ -87,19 +87,21 @@ pthread_mutex_t writeIndexLock;
 StringBuffer outputBuffer;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
 int udpSockets[MAX_CLIENTS];
+struct sockaddr_in* clientAddresses[MAX_CLIENTS];
 
-// void * send_updates() {
-//     while(true) {
-//         char currentGameState[GAME_OBJECT_BUFFER];
-//         strcpy(currentGameState, gameStateBuffer);
-//         for(int i = 0; i < MAX_CLIENTS; i++) {
-//             if(sendto(udpSockets[i], currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
-//                 printf("client %d:",client_id);
-//                 perror("send to\n");
-// 		    }
-//         }
-//     }
-// }
+void * send_updates() {
+    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    while(true) {
+        char currentGameState[GAME_OBJECT_BUFFER];
+        strcpy(currentGameState, gameStateBuffer);
+        for(int i = 0; i < MAX_CLIENTS; i++) {
+            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], sizeof(&clientAddresses[i])) < 0) {
+                printf("client %d:",client_id);
+                perror("send to\n");
+		    }
+        }
+    }
+}
 
 void * clientThread(void *t_info)
 {
@@ -134,6 +136,7 @@ void * clientThread(void *t_info)
 
     int n;
     int sentCount = 0;
+    bool first = true;
     printf("starting client %d \n", in);
     while(true) {
 
@@ -143,14 +146,18 @@ void * clientThread(void *t_info)
             perror("didnt recieve anything, recv error");
             exit(1);
         }
+        if (first) {
+            clientAddresses[in] = &udpClient;
+            first = false;
+        }
         //printf("received no: %d", tCount[in]++);
         write_buffer(readBuffer);
 
-        //send client update
+        // send client update
         // if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
         //     perror("send to\n");
 		// }
-        //printf("sent %d to client %d\n", ++sentCount, in);
+        // printf("sent %d to client %d\n", ++sentCount, in);
     }
     fflush(stdout);
     return NULL;
@@ -293,10 +300,10 @@ int main (int argc, char **argv)
     if( pthread_create(&tid[numOfClients], NULL, read_buffer, NULL) != 0 ) {
            printf("Failed to create thread\n");
     }
-    // numOfClients++;
-    // if( pthread_create(&tid[numOfClients], NULL, send_updates, NULL) != 0 ) {
-    //        printf("Failed to create thread\n");
-    // }
+    numOfClients++;
+    if( pthread_create(&tid[numOfClients], NULL, send_updates, NULL) != 0 ) {
+           printf("Failed to create thread\n");
+    }
     int numStopped = 0;
     while(true) {
         event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
