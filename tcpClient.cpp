@@ -42,7 +42,7 @@
 
 #define SERVER_TCP_PORT		7000	// Default port
 #define BUFLEN			3500  	// Buffer length
-#define SEND_COUNT 1000
+#define SEND_COUNT 10
 using namespace rapidjson;
 
 
@@ -154,9 +154,6 @@ int main (int argc, char **argv)
 	"]"
 	"}";
 
-	int value = atoi(argv[3]);
-	int id;
-
 	// Create the socket
 	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -193,11 +190,15 @@ int main (int argc, char **argv)
 		perror("recv");
 		exit(2);
 	}
-
-	printf("\n\nRECEIVED PORT NUMBER: %s\n", rbuf);
+	char delim[] = ",";
+	char *ptr = strtok(rbuf, delim);
+	int portNumber = atoi(ptr);
+	ptr = strtok(NULL, delim);
+	int client_id = atoi(ptr);
+	printf("\n\nRECEIVED PORT NUMBER AND CLIENT ID: %s\n", rbuf);
 	bzero((char *)&server, sizeof(struct sockaddr_in));
 	server.sin_family = AF_INET;
-	server.sin_port = htons(atoi(rbuf));
+	server.sin_port = htons(portNumber);
 	server.sin_addr = *((struct in_addr *)hp->h_addr);
 
 	udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -211,9 +212,8 @@ int main (int argc, char **argv)
    
     // 2. Modify it by DOM.
     Value & players = d["players"];
-	int client = value;
-	players[0]["x"].SetInt(value);
-	players[0]["id"].SetInt(value);
+	players[0]["x"].SetInt(0);
+	players[0]["id"].SetInt(client_id);
     // 3. Stringify the DOM
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -227,10 +227,10 @@ int main (int argc, char **argv)
 		strcpy(sbuf,wbuffer.GetString());
 		printf("SENDING: %s\n", sbuf);
 		if(sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
-			printf("client %d:",client);
+			printf("client %d:",client_id);
 			perror("send to\n");
 		}
-		printf("client %d sent: %d\n", client, i);
+		printf("client %d sent: %d\n", client_id, i);
 		usleep(30000);
 	}
 	

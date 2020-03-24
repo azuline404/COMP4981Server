@@ -267,7 +267,7 @@ int main (int argc, char **argv)
             fflush(stdout);
             //signal all clients to start sending
             for(int i = 0; i < numOfClients; i++) {
-                sprintf(writeBuffer,"%d", PORT_START+i);
+                sprintf(writeBuffer,"%d,%d", PORT_START+i, i);
                 printf("sent to client %d udp port %s on socket %d\n", i, writeBuffer, tcpSockets[i]);
                 if((send(tcpSockets[i], writeBuffer, sizeof(writeBuffer), 0)) < 0) {
                     perror("send port number failed\n");
