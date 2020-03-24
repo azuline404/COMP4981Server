@@ -147,10 +147,7 @@ void * clientThread(void *t_info)
             perror("didnt recieve anything, recv error");
             exit(1);
         }
-        if (first) {
-            clientAddresses[in] = &udpClient;
-            first = false;
-        }
+
         //printf("received no: %d", tCount[in]++);
         write_buffer(readBuffer);
 
