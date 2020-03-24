@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 1
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -112,20 +112,21 @@ void * clientThread(void *t_info)
     char readBuffer[BUFLEN];
     struct sockaddr_in udpServer, udpClient;
     memset(&udpServer, 0, sizeof(udpServer));
+    memset(&udpClient, 0, sizeof(udpClient));
     udpServer.sin_family = AF_INET;
     udpServer.sin_port = htons(port_number);
     udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    udpSockets[in] = ConnectivityManager::getSocket(ConnectionType::UDP);
+    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     const int i = 1;
 
-    if(setsockopt(udpSockets[in], SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
         perror("SET SOCK OPT FAILED");
     };
 
-    if (bind(udpSockets[in], (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+    if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
     {
         perror("Can't bind name to socket");
         exit(1);
@@ -137,7 +138,7 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSockets[in], readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t*)sizeof(udpClient));
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t*)sizeof(udpClient));
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
@@ -146,7 +147,7 @@ void * clientThread(void *t_info)
         write_buffer(readBuffer);
 
         //send client update
-        if(sendto(udpSockets[i], gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
+        if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
             perror("send to\n");
 		}
     }

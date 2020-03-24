@@ -231,9 +231,9 @@ int main (int argc, char **argv)
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-	if(fork() == 0) {
-		recvUpdates(udpSocket);
-	}
+	// if(fork() == 0) {
+	// 	recvUpdates(udpSocket);
+	// }
 	for(int i = 0; i < SEND_COUNT; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
