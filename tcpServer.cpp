@@ -306,6 +306,7 @@ int main (int argc, char **argv)
     //         printf("%d\t%d\n", i, tCount[i]);
     // }
     Value &player_stats = gameState["players"];
+    printf("exiting loop\n");
     for (int x = 0; x < MAX_CLIENTS; x++) {
         printf("Player x value: %d\n", player_stats[x]["x"].GetInt());
     }
