@@ -140,7 +140,7 @@ void * clientThread(void *t_info)
         memset(readBuffer, 0, BUFLEN);
         n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, (socklen_t*)sizeof(udpClient));
         if (n < 0) {
-            printf("didnt recieve anything, recv error");
+            perror("didnt recieve anything, recv error");
             exit(1);
         }
         //printf("received no: %d", tCount[in]++);
@@ -173,7 +173,6 @@ int main (int argc, char **argv)
     struct epoll_event tcpEvent, events[MAX_EVENTS];
     int epoll_fd;
     int event_count;
-    int n;
     int pid;
     int tcpSockets[MAX_CLIENTS];
 
@@ -366,6 +365,8 @@ int write_buffer(char* buffer) {
     printf("write index: %d\n",  updates->writeIndex);
     strcpy(updates->buffer[ updates->writeIndex], buffer);
     sem_post(&countsem);
+
+    return TRUE;
 }
 
 void * read_buffer(void *t_info) {
