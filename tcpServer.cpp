@@ -307,7 +307,7 @@ int main (int argc, char **argv)
         for(int i = 0; i < event_count; i++)
         {
             //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
-            n = recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
+            recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
             if((strcmp(readBuffer, "stop")) == 0) {
                 fflush(stdout);
                 numStopped++;
@@ -366,7 +366,7 @@ int write_buffer(char* buffer) {
     strcpy(updates->buffer[ updates->writeIndex], buffer);
     sem_post(&countsem);
 
-    return TRUE;
+    return 1;
 }
 
 void * read_buffer(void *t_info) {
