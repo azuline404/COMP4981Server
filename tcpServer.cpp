@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 4
+#define MAX_CLIENTS 5
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -324,7 +324,7 @@ int main (int argc, char **argv)
     Value &player_stats = gameState["players"];
     printf("exiting loop\n");
     for (int x = 0; x < MAX_CLIENTS; x++) {
-        printf("Player x value: %d\n", player_stats[x]["x"].GetInt());
+        printf("Player %d value: %d\n", x, player_stats[x]["x"].GetInt());
     }
 
     for(int x = 0; x < MAX_CLIENTS; x++) {
