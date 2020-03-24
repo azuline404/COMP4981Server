@@ -87,18 +87,31 @@ pthread_mutex_t writeIndexLock;
 pthread_mutex_t readIndexLock;
 StringBuffer outputBuffer;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
+int udpSockets[MAX_CLIENTS];
+
+// void * send_updates() {
+//     while(true) {
+//         char currentGameState[GAME_OBJECT_BUFFER];
+//         strcpy(currentGameState, gameStateBuffer);
+//         for(int i = 0; i < MAX_CLIENTS; i++) {
+//             if(sendto(udpSockets[i], currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
+//                 printf("client %d:",client_id);
+//                 perror("send to\n");
+// 		    }
+//         }
+//     }
+// }
 
 void * clientThread(void *t_info)
 {
     int *index = (int*) t_info;
     int in = *index;
-
     printf("in: %d with port: %d\n", in, UDP_PORT);
     int port_number = PORT_START + in;
     int udpSocket;
     char writeBuffer[BUFLEN];
     char readBuffer[BUFLEN];
-    struct sockaddr_in udpServer;
+    struct sockaddr_in udpServer, udpClient;
     memset(&udpServer, 0, sizeof(udpServer));
     udpServer.sin_family = AF_INET;
     udpServer.sin_port = htons(port_number);
@@ -106,14 +119,14 @@ void * clientThread(void *t_info)
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    udpSockets[in] = ConnectivityManager::getSocket(ConnectionType::UDP);
     const int i = 1;
 
-    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+    if(setsockopt(udpSockets[in], SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
         perror("SET SOCK OPT FAILED");
     };
 
-    if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+    if (bind(udpSockets[in], (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
     {
         perror("Can't bind name to socket");
         exit(1);
@@ -125,13 +138,19 @@ void * clientThread(void *t_info)
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+        n = recvfrom(udpSockets[in], readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&udpClient, sizeof(udpClient));
         if (n < 0) {
             printf("didnt recieve anything, recv error");
             exit(1);
         }
         //printf("received no: %d", tCount[in]++);
         write_buffer(readBuffer);
+
+        //send client update
+        if(sendto(udpSockets[i], gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
+            printf("client %d:",client_id);
+            perror("send to\n");
+		}
     }
     fflush(stdout);
     return NULL;
@@ -159,7 +178,7 @@ int main (int argc, char **argv)
     int pid;
     int tcpSockets[MAX_CLIENTS];
 
-    pthread_t tid[MAX_CLIENTS+1];
+    pthread_t tid[MAX_CLIENTS+2];
     char readBuffer[BUFLEN];
     char writeBuffer[BUFLEN];
 
@@ -280,7 +299,10 @@ int main (int argc, char **argv)
     if( pthread_create(&tid[numOfClients], NULL, read_buffer, NULL) != 0 ) {
            printf("Failed to create thread\n");
     }
-
+    // numOfClients++;
+    // if( pthread_create(&tid[numOfClients], NULL, send_updates, NULL) != 0 ) {
+    //        printf("Failed to create thread\n");
+    // }
     int numStopped = 0;
     while(true) {
         event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);

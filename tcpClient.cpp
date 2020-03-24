@@ -43,8 +43,21 @@
 #define SERVER_TCP_PORT		7000	// Default port
 #define BUFLEN			3500  	// Buffer length
 #define SEND_COUNT 10
+#define GAME_OBJECT_BUFFER 65000
+
 using namespace rapidjson;
 
+void recvUpdates(int fd) {
+	int count = 0;
+	char recvbuf[GAME_OBJECT_BUFFER];
+	while(true) {
+		if (recvfrom(fd, recvbuf, sizeof(recvbuf), 0, NULL, NULL) < 0) {
+			perror("read failed \n");
+		};
+		count++;
+		printf("total received: %d", count);
+	}
+}
 
 int main (int argc, char **argv)
 {
@@ -190,12 +203,12 @@ int main (int argc, char **argv)
 		perror("recv");
 		exit(2);
 	}
+	printf("\n\nRECEIVED PORT NUMBER AND CLIENT ID: %s\n", rbuf);
 	char delim[] = ",";
 	char *ptr = strtok(rbuf, delim);
 	int portNumber = atoi(ptr);
 	ptr = strtok(NULL, delim);
 	int client_id = atoi(ptr);
-	printf("\n\nRECEIVED PORT NUMBER AND CLIENT ID: %s\n", rbuf);
 	bzero((char *)&server, sizeof(struct sockaddr_in));
 	server.sin_family = AF_INET;
 	server.sin_port = htons(portNumber);
@@ -218,7 +231,9 @@ int main (int argc, char **argv)
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-
+	if(fork() == 0) {
+		recvUpdates(udpSocket);
+	}
 	for(int i = 0; i < SEND_COUNT; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
@@ -247,8 +262,10 @@ int main (int argc, char **argv)
 
 	n = 0;
 	//Wait for server response that will never arrive
-	recvfrom(udpSocket, rbuf, sizeof(rbuf), 0, NULL, NULL);
-
+	//recvfrom(udpSocket, rbuf, sizeof(rbuf), 0, NULL, NULL);
+	while(true) {
+		//hack to keep thread alive
+	}
 	printf ("\n\nReceived: %s\n", rbuf);
 	fflush(stdout);
 	close (sd);
