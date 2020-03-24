@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 5
+#define MAX_CLIENTS 
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
@@ -96,7 +96,6 @@ void * send_updates() {
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < MAX_CLIENTS; i++) {
             if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], sizeof(&clientAddresses[i])) < 0) {
-                printf("client %d:",client_id);
                 perror("send to\n");
 		    }
         }
