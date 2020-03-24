@@ -55,7 +55,7 @@ void recvUpdates(int fd) {
 			perror("read failed \n");
 		};
 		count++;
-		printf("total received: %d", count);
+		printf("total received: %d\n", count);
 	}
 }
 
@@ -231,21 +231,21 @@ int main (int argc, char **argv)
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-	// if(fork() == 0) {
-	// 	recvUpdates(udpSocket);
-	// }
+	if(fork() == 0) {
+		recvUpdates(udpSocket);
+	}
 	for(int i = 0; i < SEND_COUNT; i++) {
 		players[0]["x"].SetInt(i);
 		StringBuffer wbuffer;
 		Writer<StringBuffer>writer2(wbuffer);
 		d.Accept(writer2);
 		strcpy(sbuf,wbuffer.GetString());
-		printf("SENDING: %s\n", sbuf);
+		//printf("SENDING: %s\n", sbuf);
 		if(sendto (udpSocket, sbuf, BUFLEN, 0,(struct sockaddr *)&server, sizeof(server)) < 0) {
 			printf("client %d:",client_id);
 			perror("send to\n");
 		}
-		printf("client %d sent: %d\n", client_id, i);
+		//printf("client %d sent: %d\n", client_id, i);
 		usleep(30000);
 	}
 	

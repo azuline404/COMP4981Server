@@ -28,7 +28,7 @@
 #define GAME_OBJECT_BUFFER 65000
 #define BUFLEN	3500		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 1
+#define MAX_CLIENTS 4
 #define MAX_EVENTS 2
 #define PORT_START 12500
 
