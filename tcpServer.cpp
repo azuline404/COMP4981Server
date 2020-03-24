@@ -324,6 +324,7 @@ int write_buffer(char* buffer) {
     //only one thread at a time can read and modify write index
    // sem_wait(&writeIndex);
     if (updates->writeIndex++ >= MAX_CLIENTS) {
+        printf("resetting write index to 0\n");
         updates->writeIndex = 0;
     }
     //sem_post(&writeIndex);
@@ -345,15 +346,14 @@ void * read_buffer(void *t_info) {
         sem_wait(&countsem);
         pthread_mutex_lock(&circularBufferLock);
         if (updates->readIndex++ >= (MAX_CLIENTS)) {
+            printf("resetting read index to 0\n");
             updates->readIndex= 0;
         }
         printf("read index: %d\n", updates->readIndex);
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
         received.Parse(readBuffer);
-        printf("before updatedPlayer\n");
         Value& updatedPlayer = received["players"][0];
-        printf("before id\n");
         int id = updatedPlayer["id"].GetInt();
         tCount[id]++;
         //printf("outside mutex and sem\n");
