@@ -50,6 +50,7 @@ using namespace rapidjson;
 void recvUpdates(int fd) {
 	int count = 0;
 	char recvbuf[GAME_OBJECT_BUFFER];
+	printf("inside recvUpdate");
 	while(true) {
 		if (recvfrom(fd, recvbuf, sizeof(recvbuf), 0, NULL, NULL) < 0) {
 			perror("read failed \n");
