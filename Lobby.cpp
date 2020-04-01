@@ -19,7 +19,9 @@ string Lobby::getStatus()
     return this->status;
 }
 
-
+std::vector<pthread_t> Lobby::getThreadIds() {
+    return this->threadIds;
+}
 void Lobby::setStatus(string status)
 {
     this->status = status;

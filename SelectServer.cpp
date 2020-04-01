@@ -22,18 +22,9 @@
 #include <algorithm>
 #include <unistd.h>
 #include <array>
-
-#define SERVER_TCP_PORT 7000	// Default port
-#define BUFLEN	8096	//Buffer length
-#define TRUE	1
-#define LISTENQ	5
-#define MAXLINE 4096
-#define  CREATE 0
-#define  DESTROY 1
-#define  GET_ALL 2
-#define GET_ONE 3
-#define  JOIN 4
-#define  LEAVE 5
+#include <pthread.h>
+#include <signal.h>
+#include <semaphore.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -47,6 +38,31 @@ volatile int UDP_PORT = 12500;
 LobbyManager * lobbyManager = new LobbyManager();
 Document document;
 std::vector<Client*>clientList;
+int write_buffer(char* buffer);
+void * read_buffer(void *t_info);
+struct circular* circularBuffer;
+pthread_mutex_t circularBufferLock;
+pthread_mutex_t writeIndexLock;
+sem_t countsem, spacesem, writeIndex, readIndex;
+//probably need to remove these
+pthread_t readBufferThread;
+pthread_t sendUpdateThread;
+Document gameState;
+char gameStateBuffer[GAME_OBJECT_BUFFER];
+StringBuffer outputBuffer;
+int tCount[CIRC_BUFFER_SIZE] = {0}; //for testing only
+
+void initializeSync() {
+	sem_init(&countsem, 0, 0);
+    sem_init(&writeIndex, 0, 1);
+    sem_init(&spacesem, 0, CIRC_BUFFER_SIZE);
+	if (pthread_mutex_init(&circularBufferLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+    } 
+    if (pthread_mutex_init(&writeIndexLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+    } 
+}
 
 int validateJSON(char * buffer) {
 	/* This portion is used to test with your own client */
@@ -176,6 +192,151 @@ void broadcastLobbyUpdate(Lobby * lobby) {
 	}
 }
 
+void * send_updates(void * clientptr) {
+	Client *client = (Client*) clientptr;
+    int udpSocket;
+	if ( (udpSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+    int count = 0;
+    while(true) {
+        char currentGameState[GAME_OBJECT_BUFFER];
+        strcpy(currentGameState, gameStateBuffer);
+        for(int i = 0; i < clientList.size(); i++) {
+			int len = sizeof( client->getUdpAddress());
+            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)client->getUdpAddress(), (socklen_t) len) < 0) {
+                perror("send to\n");
+		    }
+        }
+        printf("sent: %d \n ", count++);
+        usleep(30000);
+    }
+}
+
+void * read_buffer(void *t_info) {
+    Value &player_stats = gameState["players"];
+    char readBuffer[BUFLEN];
+
+    while(true) {
+        memset(readBuffer, 0, sizeof(readBuffer));
+
+        //read json string from circular buffer
+        sem_wait(&countsem);
+        pthread_mutex_lock(&circularBufferLock);
+
+        if (++circularBuffer->readIndex >= CIRC_BUFFER_SIZE) {
+            circularBuffer->readIndex= 0;
+        }
+        strcpy(readBuffer, circularBuffer->buffer[circularBuffer->readIndex]);
+        Document received;
+        received.Parse(readBuffer);
+        Value& updatedPlayer = received["players"][0];
+        int id = updatedPlayer["id"].GetInt();
+        tCount[id]++;
+
+        player_stats[id] = updatedPlayer;
+
+        memset(gameStateBuffer, 0, sizeof(gameStateBuffer));
+        outputBuffer.Clear();
+	    Writer<StringBuffer> writer(outputBuffer);
+    
+	    gameState.Accept(writer);
+
+        strcpy(gameStateBuffer, outputBuffer.GetString());
+        circularBuffer->updateCount++;
+        pthread_mutex_unlock(&circularBufferLock);
+        sem_post(&spacesem);
+    }
+}
+
+//CALLED BY CLIENT THREADS TO WRITE UPDATES TO CIRCULAR BUFFER
+int write_buffer(char* buffer) {
+    sem_wait(&spacesem);
+    pthread_mutex_lock(&circularBufferLock);
+    //only one thread at a time can read and modify write index
+   sem_wait(&writeIndex);
+   pthread_mutex_lock(&writeIndexLock);
+    if (++circularBuffer->writeIndex >= CIRC_BUFFER_SIZE) {
+        circularBuffer->writeIndex = 0;
+    }
+    pthread_mutex_unlock(&writeIndexLock);
+    sem_post(&writeIndex);
+    pthread_mutex_unlock(&circularBufferLock);
+    strcpy(circularBuffer->buffer[ circularBuffer->writeIndex], buffer);
+    sem_post(&countsem);
+
+    return 1;
+}
+
+void * clientThread(void *info)
+{
+    Client* client = (Client*) info;
+
+    char writeBuffer[BUFLEN];
+    char readBuffer[BUFLEN];
+    struct sockaddr_in udpServer, udpClient;
+    memset(&udpServer, 0, sizeof(udpServer));
+    memset(&udpClient, 0, sizeof(udpClient));
+    udpServer.sin_family = AF_INET;
+    udpServer.sin_port = htons(client->getUDPPort());
+    udpServer.sin_addr.s_addr = htonl(INADDR_ANY); 
+    //send udp port to client
+    memset(writeBuffer, 0, sizeof(writeBuffer));
+    strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
+    int udpSocket;
+	if ( (udpSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+    const int i = 1;
+    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+        perror("SET SOCK OPT FAILED");
+    };
+
+    if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+    {
+        exit(1);
+    }
+    int len = sizeof( client->getUdpAddress());
+    int n;
+    int sentCount = 0;
+    bool first = true;
+    printf("starting client %d \n", client->getPlayer_Id());
+    while(true) {
+        memset(readBuffer, 0, BUFLEN);
+        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)client->getUdpAddress(), (socklen_t *) &len);
+        if (n < 0) {
+            perror("didnt recieve anything, recv error");
+            exit(1);
+        }
+
+        //printf("received no: %d", tCount[in]++);
+        write_buffer(readBuffer);
+    }
+    fflush(stdout);
+    close(udpSocket);
+    return NULL;
+}
+
+void createClientAndUpdateThreads(Lobby *lobby) {
+	vector<Client*>clientsInLobby = lobby->getClientList();
+	vector<pthread_t> threads = lobby->getThreadIds();
+	for(int i = 0; i < lobby->getClientList().size(); i++){
+		if( pthread_create(&(lobby->threadIds[i]), NULL, clientThread, clientsInLobby[i]) != 0 ) {
+			printf("Failed to create thread\n");
+		}
+	}
+
+	if( pthread_create(&readBufferThread, NULL, read_buffer, NULL) != 0 ) {
+           printf("Failed to create thread\n");
+    }
+	
+	if( pthread_create(&sendUpdateThread, NULL, send_updates, NULL) != 0 ) {
+           printf("Failed to create thread\n");
+    }
+
+}
 
 /*
 	Start of the program.
@@ -457,10 +618,11 @@ int main (int argc, char **argv)
 						lobby->setStatus("active");
 						broadcastStartLobby(lobby);
 						// send response to all clients to load the game
-					}
-					else {
+					} else {
 							throw std::invalid_argument("Not all players ready");
 					}
+					initializeSync();
+					createClientAndUpdateThreads(lobby);
 					
 				}
 				else if (request == "playerReady") {

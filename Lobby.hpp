@@ -11,6 +11,7 @@ class Lobby {
         string getStatus();
         void setStatus(string status);
         std::vector<Client*> getClientList();
+        std::vector<pthread_t> getThreadIds();
         int getLobbyOwner();
         void setLobbyOwner(int lobbyOwner);
         int getId();
@@ -21,6 +22,7 @@ class Lobby {
         void printInfo();
         bool getLobbyReady();
         bool getLoadingReady();
+        std::vector<pthread_t> threadIds;
 
     private:
         int id;

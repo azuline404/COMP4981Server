@@ -21,6 +21,7 @@ class Client {
         int getLobby_Id();
         void setLoadingStatus(string newStatus);
         string getLoadingStatus();
+        struct sockaddr_in* getUdpAddress();
         
     private:
         string player_name;
@@ -33,4 +34,5 @@ class Client {
         int IP;
         int lobby_id;
         string loadingStatus;
+        struct sockaddr_in* udpAddress;
 };

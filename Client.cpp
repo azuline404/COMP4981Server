@@ -26,6 +26,7 @@ int Client::getUDPPort() {
 int Client::getTCPSocket() {
     return this->TCPSocket;
 }
+
 string Client::getPlayer_name()
 {
     return this->player_name;
@@ -89,4 +90,8 @@ void Client::setLoadingStatus(string newStatus)
 string Client::getLoadingStatus()
 {
     return this->loadingStatus;
+}
+
+struct sockaddr_in* Client::getUdpAddress() {
+    return this->udpAddress;
 }
