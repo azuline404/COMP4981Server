@@ -22,6 +22,8 @@ class Client {
         void setLoadingStatus(string newStatus);
         string getLoadingStatus();
         struct sockaddr_in* getUdpAddress();
+        void setUDPSocket(int udpSocket);
+        int getUDPSocket();
         
     private:
         string player_name;
@@ -30,6 +32,7 @@ class Client {
         int characterClass;
         int team;
         int TCPSocket;
+        int UDPSocket;
         int UDPPort;
         int IP;
         int lobby_id;

@@ -50,6 +50,7 @@ Document gameState;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
 StringBuffer outputBuffer;
 int tCount[CIRC_BUFFER_SIZE] = {0}; //for testing only
+int totalClientsReceived = 0;
 
 void initializeSync() {
 	sem_init(&countsem, 0, 0);
@@ -196,24 +197,19 @@ void broadcastLobbyUpdate(Lobby * lobby) {
 }
 
 void * send_updates(void * clientptr) {
-	Client *client = (Client*) clientptr;
-    int udpSocket;
-	if ( (udpSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("socket creation failed"); 
-        exit(EXIT_FAILURE); 
-    } 
     int count = 0;
+	sem_wait(&clientsem);
     while(true) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < clientList.size(); i++) {
-			int len = sizeof( client->getUdpAddress());
-            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)client->getUdpAddress(), (socklen_t) len) < 0) {
+			int len = sizeof( clientList[i]->getUdpAddress());
+            if(sendto(clientList[i]->getUDPSocket(), currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientList[i]->getUdpAddress(), (socklen_t) len) < 0) {
                 perror("send to\n");
 		    }
         }
         printf("sent: %d \n ", count++);
-        usleep(30000);
+        usleep(50000);
     }
 }
 
@@ -301,6 +297,7 @@ void * clientThread(void *info)
     {
         exit(1);
     }
+	client->setUDPSocket(udpSocket);
     int len = sizeof( client->getUdpAddress());
     int n;
     int sentCount = 0;
@@ -626,6 +623,8 @@ int main (int argc, char **argv)
 					}
 					initializeSync();
 					createClientAndUpdateThreads(lobby);
+					//start sending game update
+					sem_post(&clientsem);
 					
 				}
 				else if (request == "playerReady") {

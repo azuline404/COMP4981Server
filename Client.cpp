@@ -27,6 +27,13 @@ int Client::getTCPSocket() {
     return this->TCPSocket;
 }
 
+void Client::setUDPSocket(int udpSocket) {
+    this->UDPSocket = udpSocket;
+}
+
+int Client::getUDPSocket() {
+    return this->UDPSocket;
+}
 string Client::getPlayer_name()
 {
     return this->player_name;
