@@ -41,9 +41,8 @@ std::vector<Client*>clientList;
 int write_buffer(char* buffer);
 void * read_buffer(void *t_info);
 struct circular* circularBuffer;
-pthread_mutex_t circularBufferLock;
-pthread_mutex_t writeIndexLock;
-sem_t countsem, spacesem, writeIndex, readIndex;
+pthread_mutex_t circularBufferLock, writeIndexLock, clientCounterLock;
+sem_t countsem, spacesem, writeIndex, readIndex, clientsem ;
 //probably need to remove these
 pthread_t readBufferThread;
 pthread_t sendUpdateThread;
@@ -56,10 +55,14 @@ void initializeSync() {
 	sem_init(&countsem, 0, 0);
     sem_init(&writeIndex, 0, 1);
     sem_init(&spacesem, 0, CIRC_BUFFER_SIZE);
+	sem_init(&clientsem, 0, 0);
 	if (pthread_mutex_init(&circularBufferLock, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
     } 
     if (pthread_mutex_init(&writeIndexLock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+    } 
+	if (pthread_mutex_init(&clientCounterLock, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
     } 
 }
