@@ -92,7 +92,6 @@ struct sockaddr_in* clientAddresses[MAX_CLIENTS];
 int totalClientsReceived = 0;
 
 void * send_updates(void * info) {
-    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     int count = 0;
     // This semaphore forces the send_update to block until the server receives a UDP signal from all clients
     sem_wait(&clientsem);
@@ -100,12 +99,12 @@ void * send_updates(void * info) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < MAX_CLIENTS; i++) {
-            if(sendto(udpSocket, (void *)currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], (socklen_t)sizeof(*clientAddresses[i])) < 0) {
+            if(sendto(udpSockets[i], currentGameState, strlen(currentGameState), 0,(struct sockaddr *)clientAddresses[i], (socklen_t)sizeof(*clientAddresses[i])) < 0) {
                 perror("send to failed");
 		    }
         }
         printf("sent: %d \n ", count++);
-        usleep(30000);
+        usleep(50000);
     }
 }
 
@@ -126,7 +125,8 @@ void * clientThread(void *t_info)
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    udpSockets[in] = ConnectivityManager::getSocket(ConnectionType::UDP);
+    int udpSocket = udpSockets[in];
     const int i = 1;
 
     if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
@@ -184,7 +184,7 @@ void * clientThread(void *t_info)
 }
 
 void init_gameState() {
-    FILE* fp = fopen("./gameObject.json", "r");
+    FILE* fp = fopen("./gameObject2.json", "r");
 
     char buff[65536];
     FileReadStream is(fp, buff, sizeof(buff));
@@ -420,7 +420,7 @@ void * read_buffer(void *t_info) {
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
         received.Parse(readBuffer);
-        Value& updatedPlayer = received["players"][0];
+        Value& updatedPlayer = received["updates"][0];
         int id = updatedPlayer["id"].GetInt();
         tCount[id]++;
 
