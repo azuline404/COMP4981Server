@@ -21,7 +21,7 @@ int ConnectivityManager::getSocket(ConnectionType type) {
 }
 
 bool ConnectivityManager::closeSocket(int socket) {
-    close(socket);
+    return close(socket);
 }
 
 
