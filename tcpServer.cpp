@@ -74,7 +74,7 @@ void print_buffer();
 
 
 //Semaphore ID's
-sem_t countsem, spacesem, writeIndex, readIndex;
+sem_t countsem, spacesem, writeIndex, readIndex, clientsem;
 
 //Global game state object
 Document gameState;
@@ -84,24 +84,27 @@ volatile int UDP_PORT = 12500;
 struct circular* updates;
 pthread_mutex_t circularBufferLock;
 pthread_mutex_t writeIndexLock;
+pthread_mutex_t clientCounterLock;
 StringBuffer outputBuffer;
 char gameStateBuffer[GAME_OBJECT_BUFFER];
 int udpSockets[MAX_CLIENTS];
 struct sockaddr_in* clientAddresses[MAX_CLIENTS];
+int totalClientsReceived = 0;
 
 void * send_updates(void * info) {
-    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     int count = 0;
+    // This semaphore forces the send_update to block until the server receives a UDP signal from all clients
+    sem_wait(&clientsem);
     while(true) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < MAX_CLIENTS; i++) {
-            if(sendto(udpSocket, currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientAddresses[i], sizeof(*clientAddresses[i])) < 0) {
-                perror("send to\n");
+            if(sendto(udpSockets[i], currentGameState, strlen(currentGameState), 0,(struct sockaddr *)clientAddresses[i], (socklen_t)sizeof(*clientAddresses[i])) < 0) {
+                perror("send to failed");
 		    }
         }
         printf("sent: %d \n ", count++);
-        usleep(30000);
+        usleep(50000);
     }
 }
 
@@ -122,7 +125,8 @@ void * clientThread(void *t_info)
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
+    udpSockets[in] = ConnectivityManager::getSocket(ConnectionType::UDP);
+    int udpSocket = udpSockets[in];
     const int i = 1;
 
     if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
@@ -139,6 +143,24 @@ void * clientThread(void *t_info)
     int sentCount = 0;
     bool first = true;
     printf("starting client %d \n", in);
+
+    // Wait for initial client address
+    memset(readBuffer, 0, BUFLEN);
+    n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &len);
+    if (n < 0) {
+        perror("didnt recieve anything, recv error");
+        exit(1);
+    }
+
+    write_buffer(readBuffer);
+
+    // This will release the semaphore to allow the server to begin sending updates to all clients
+    pthread_mutex_lock(&writeIndexLock);
+    if (++totalClientsReceived == MAX_CLIENTS) {
+        sem_post(&clientsem);
+    }
+    pthread_mutex_unlock(&writeIndexLock);
+
     while(true) {
 
         memset(readBuffer, 0, BUFLEN);
@@ -162,7 +184,7 @@ void * clientThread(void *t_info)
 }
 
 void init_gameState() {
-    FILE* fp = fopen("./gameObject.json", "r");
+    FILE* fp = fopen("./gameObject2.json", "r");
 
     char buff[65536];
     FileReadStream is(fp, buff, sizeof(buff));
@@ -216,7 +238,11 @@ int main (int argc, char **argv)
     if (pthread_mutex_init(&writeIndexLock, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
         return 1; 
-    } 
+    }
+    if (pthread_mutex_init(&clientCounterLock, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
 
     //set up client addresses array
      for(int i = 0; i < MAX_CLIENTS; i++) {
@@ -227,6 +253,7 @@ int main (int argc, char **argv)
     sem_init(&countsem, 0, 0);
     sem_init(&writeIndex, 0, 1);
     sem_init(&spacesem, 0, MAX_CLIENTS);
+    sem_init(&clientsem, 0, 0);
     
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
@@ -350,6 +377,9 @@ int main (int argc, char **argv)
     if(sem_destroy(&writeIndex) == -1) {
         perror("Error removing semaphore");
     }
+    if(sem_destroy(&clientsem) == -1) {
+        perror("Error removing semaphore");
+    }
     kill(pid, SIGINT);
 	return(0);
 }
@@ -390,7 +420,7 @@ void * read_buffer(void *t_info) {
         strcpy(readBuffer, updates->buffer[updates->readIndex]);
         Document received;
         received.Parse(readBuffer);
-        Value& updatedPlayer = received["players"][0];
+        Value& updatedPlayer = received["updates"][0];
         int id = updatedPlayer["id"].GetInt();
         tCount[id]++;
 
