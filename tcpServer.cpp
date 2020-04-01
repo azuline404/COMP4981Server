@@ -24,15 +24,21 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 
+#include <sys/sem.h>
+#include <semaphore.h>
+
 #define SERVER_TCP_PORT 7000	// Default port
 #define GAME_OBJECT_BUFFER 65000
-#define BUFLEN	3500		//Buffer length
+#define BUFLEN	2000		//Buffer length
 #define PORT 8080
 #define MAX_CLIENTS 1
 #define MAX_EVENTS 2
-#define PORT_START 12500
+volatile int UDP_PORT = 12500;
 
 using namespace std;
+
+
+
 using namespace rapidjson;
 
 /*
@@ -124,14 +130,14 @@ void * clientThread(void *t_info)
     strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
     int udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
     const int i = 1;
-
-    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+    if(setsockopt(udpSock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
         perror("SET SOCK OPT FAILED");
     };
 
     if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
     {
-        perror("Can't bind name to socket");
+        fprintf(stderr, "Failed to add udp file descriptor to epoll\n");
+        close(epoll_fd);
         exit(1);
     }
     int len = sizeof(*clientAddresses[in]);
@@ -140,7 +146,6 @@ void * clientThread(void *t_info)
     bool first = true;
     printf("starting client %d \n", in);
     while(true) {
-
         memset(readBuffer, 0, BUFLEN);
         n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)clientAddresses[in], (socklen_t *) &len);
         if (n < 0) {
@@ -151,13 +156,11 @@ void * clientThread(void *t_info)
         //printf("received no: %d", tCount[in]++);
         write_buffer(readBuffer);
 
-        // send client update
-        // if(sendto(udpSocket, gameStateBuffer, sizeof(gameStateBuffer), 0,(struct sockaddr *)&udpClient, sizeof(udpClient)) < 0) {
-        //     perror("send to\n");
-		// }
-        // printf("sent %d to client %d\n", ++sentCount, in);
     }
+    printf("close socket %d", sd);
     fflush(stdout);
+	close(sd);
+    close(udpSock);
     return NULL;
 }
 
@@ -246,12 +249,7 @@ int main (int argc, char **argv)
 		exit(1);
 	}
 
-    if((epoll_fd = epoll_create1(0)) == -1)
-    {
-        fprintf(stderr, "Failed to create epoll file descriptor\n");
-        exit(1);
-    }
-
+	// Listen for connections
 
 	// queue up to 5 connect requests
 	listen(sd, 5);
@@ -259,7 +257,7 @@ int main (int argc, char **argv)
 	while (true)
 	{
 		client_len= sizeof(client);
-		if ((tcpSockets[numOfClients] = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
+		if ((new_sd = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
 		{
 			perror("accept client\n");
 			exit(1);
@@ -295,6 +293,7 @@ int main (int argc, char **argv)
                 }
             }
             fflush(stdout);
+            start = 1;
             break;
         }
 	}
@@ -409,6 +408,5 @@ void * read_buffer(void *t_info) {
 
     }
 }
-
 
 

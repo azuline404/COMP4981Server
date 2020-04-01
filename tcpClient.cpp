@@ -84,10 +84,10 @@ int main (int argc, char **argv)
 			port =	atoi(argv[2]);
 			break;
 		default:
-			fprintf(stderr, "Usage: %s host [port] [id]\n", argv[0]);
+			fprintf(stderr, "Usage: %s host [port]\n", argv[0]);
 			exit(1);
 	}
-    const char * json = "{"
+    const char * json2 = "{"
     "\"players\":["
         "{"
                 "\"id\":0,"
@@ -98,72 +98,12 @@ int main (int argc, char **argv)
                 "\"artist\":\"Cranberries\","
                 "\"track_number\":\"01\","
                 "\"codecname\":\"mp3\","
-				"\"formatname2\":\"mp3\","
-                "\"title2\":\"Zombie\","
-                "\"bitrate2\":160000,"
-                "\"artist2\":\"Cranberries\","
-                "\"track_number2\":\"01\","
-                "\"codecname2\":\"mp3\","
-				"\"formatname3\":\"mp3\","
-                "\"title3\":\"Zombie\","
-                "\"bitrate3\":160000,"
-                "\"artist3\":\"Cranberries\","
-                "\"track_number3\":\"01\","
-                "\"codecname3\":\"mp3\","
-				"\"formatname4\":\"mp3\","
-                "\"title4\":\"Zombie\","
-                "\"bitrate4\":160000,"
-                "\"artist4\":\"Cranberries\","
-                "\"track_number4\":\"01\","
-                "\"codecname4\":\"mp3\","
-				"\"formatname5\":\"mp3\","
-                "\"title5\":\"Zombie\","
-                "\"bitrate5\":160000,"
-                "\"artist5\":\"Cranberries\","
-                "\"track_number5\":\"01\","
-                "\"codecname5\":\"mp3\","
-				"\"formatname6\":\"mp3\","
-                "\"title6\":\"Zombie\","
-                "\"bitrate6\":160000,"
-                "\"artist6\":\"Cranberries\","
-                "\"track_number6\":\"01\","
-                "\"codecname6\":\"mp3\","
-				"\"formatname7\":\"mp3\","
-                "\"title7\":\"Zombie\","
-                "\"bitrate7\":160000,"
-                "\"artist7\":\"Cranberries\","
-                "\"track_number7\":\"01\","
-                "\"codecname7\":\"mp3\","
-				"\"formatname8\":\"mp3\","
-                "\"title8\":\"Zombie\","
-                "\"bitrate8\":160000,"
-                "\"artist8\":\"Cranberries\","
-                "\"track_number8\":\"01\","
-                "\"codecname8\":\"mp3\","
-				"\"formatname9\":\"mp3\","
-                "\"title9\":\"Zombie\","
-                "\"bitrate9\":160000,"
-                "\"artist9\":\"Cranberries\","
-                "\"track_number9\":\"01\","
-                "\"codecname9\":\"mp3\","
-				"\"formatname10\":\"mp3\","
-                "\"title10\":\"Zombie\","
-                "\"bitrate10\":160000,"
-                "\"artist10\":\"Cranberries\","
-                "\"track_number10\":\"01\","
-                "\"codecname10\":\"mp3\","
-				"\"formatname10\":\"mp3\","
-                "\"title10\":\"Zombie\","
-                "\"bitrate10\":160000,"
-                "\"artist10\":\"Cranberries\","
-                "\"track_number10\":\"01\","
-                "\"codecname10\":\"mp3\","
-				"\"formatname11\":\"mp3\","
-                "\"title11\":\"Zombie\","
-                "\"bitrate11\":160000,"
-                "\"artist11\":\"Cranberries\","
-                "\"track_number11\":\"01\","
-                "\"codecname11\":\"mp3\""
+				"\"formatname\":\"mp3\","
+                "\"title\":\"Zombie\","
+                "\"bitrate\":160000,"
+                "\"artist\":\"Cranberries\","
+                "\"track_number\":\"01\","
+                "\"codecname\":\"mp3\""
        " }"
 	"]"
 	"}";
@@ -250,17 +190,11 @@ int main (int argc, char **argv)
 		usleep(30000);
 	}
 	
-	//clear send buffer, write "stop" to send buffer, send
-	memset(sbuf, 0, BUFLEN);
-	strcpy(sbuf, "stop");
-	printf("sbuf: %s", sbuf);
-	if(send(sd, sbuf, BUFLEN, 0) < 0) {
-		perror("send stop");
-	}
 
 	bp = rbuf;
 	bytes_to_read = BUFLEN;
 
+	// client makes repeated calls to recv until no more data is expected to arrive.
 	n = 0;
 	//Wait for server response that will never arrive
 	//recvfrom(udpSocket, rbuf, sizeof(rbuf), 0, NULL, NULL);

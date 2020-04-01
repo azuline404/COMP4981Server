@@ -10,17 +10,22 @@ class Lobby {
         int getCurrentPlayers();
         string getStatus();
         void setStatus(string status);
-        std::vector<Client> getClientList();
-        void setClientList(std::vector<Client> clientList);
+        std::vector<Client*> getClientList();
         int getLobbyOwner();
         void setLobbyOwner(int lobbyOwner);
         int getId();
         void setId(int id);
+        void addClient(Client* client);
+        void removeClient(Client *client);
+        void removeAllClients();
+        void printInfo();
+        bool getLobbyReady();
+        bool getLoadingReady();
 
     private:
         int id;
         int currentPlayers = 0;
         string status;
-        std::vector<Client> clientList;
+        std::vector<Client*> clientList;
         int lobbyOwner;
 };
