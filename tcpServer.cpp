@@ -10,11 +10,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/msg.h>
-#include <signal.h>
-
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/document.h"
@@ -24,134 +19,146 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
 
+#include <sys/sem.h>
+#include <semaphore.h>
+
 #define SERVER_TCP_PORT 7000	// Default port
 #define GAME_OBJECT_BUFFER 65000
-#define BUFLEN	3500		//Buffer length
+#define BUFLEN	2000		//Buffer length
 #define PORT 8080
-#define MAX_CLIENTS 16
+#define MAX_CLIENTS 20
 #define MAX_EVENTS 2
-#define PORT_START 12500
+volatile int UDP_PORT = 12500;
 
 using namespace std;
+
+
+
 using namespace rapidjson;
 
-/*-----This file is a giant mess... needs some cleanup----*/
-/*-----I'll get to that eventually...-----*/
-
-struct tStruct {
-    int tcpSocket;
-    int udpSocket;
-    int clientNo;
-};
-
-/*
- * TODO
- * 	- Either
- * 		a) add JSON interactions to read_buffer() function
- * 		b) Create a new struct to hold data and only update JSON when preparing to send(Ellaine's idea)
- * 	- Add a second semaphore for the write_buffer() function that interacts with the circular buffer?
- * 	- Tomas: Discuss these fancy things with Ellaine
- * 	- Ellaine: Look through this thing and see if all the stuff I altered today makes sense or
- * 		   if you think we should redo some stuff
- *	- Tomas/Ellaine/Both: Do some clean up
- *		a) Create classes/Connect our stuff into Tommy's classes
- *		b) Seperate into wrapper files (i.e semaphore functions, circular buffer functions, etc)
- *		c) Fix the compiler warnings *low prio as long as things work?*
- */
-
-//Struct for Circular buffer
-/*-----The circular buffer operates on a producer-consumer type pattern, do we need 2 semaphores?-----*/
-struct circular {
-    int writeIndex;
-    int readIndex;
-    int bufferLength; /*can possibly be replaced with semaphore?*/
-    int updateCount; /*temp variable to check if read_buffer() running as intended,
-    		       should equal the total # of messages received*/
-    char buffer[MAX_CLIENTS][BUFLEN];
-};
-
-/*-----------Function prototypes-----------*/
-//JSON interaction functions
 int update_json(char* buffer, const Value *p);
-//Circular buffer functions
-int write_buffer(char* buffer);
-int read_buffer();
-void set_wIndex();
-void set_rIndex();
-void print_buffer();
-//Semaphore functions
+
 int init_semaphore(int sem_id, key_t key);
 void P(int sem_id);
 void V(int sem_id);
 int remove_semaphore(int sem_id);
 
-//Semaphore ID's
-int sem_id; circular_sem;
+int sem_id;
 
-//Are we still using this?
 volatile int start = 0;
-
-int tCount[MAX_CLIENTS] = {0};
-volatile int UDP_PORT = 12500;
-struct circular* updates;
-
-void * clientThread(void *t_info)
+void * clientThread(void *arg)
 {
-    int *index = (int*) t_info;
-    int in = *index;
-
-    printf("in: %d with port: %d\n", in, UDP_PORT);
-    int port_number = PORT_START + in;
-    int udpSocket;
-    char writeBuffer[BUFLEN];
-    char gameObjectBuffer[GAME_OBJECT_BUFFER];
-    char readBuffer[BUFLEN];
-    struct sockaddr_in udpServer;
-    memset(&udpServer, 0, sizeof(udpServer));
-    udpServer.sin_family = AF_INET;
-    udpServer.sin_port = htons(port_number);
-    udpServer.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
-    //send udp port to client
-    memset(writeBuffer, 0, sizeof(writeBuffer));
-    strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
-    udpSocket = ConnectivityManager::getSocket(ConnectionType::UDP);
-    const int i = 1;
-
-    if(setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
-        perror("SET SOCK OPT FAILED");
-    };
-    if (bind(udpSocket, (struct sockaddr *)&udpServer, sizeof(udpServer)) == -1)
+    struct epoll_event tcpEvent, events[MAX_EVENTS];
+    struct epoll_event udpEvent;
+    int epoll_fd = epoll_create1(0);
+ 
+    if(epoll_fd == -1)
     {
-        perror("Can't bind name to socket");
+        fprintf(stderr, "Failed to create epoll file descriptor\n");
         exit(1);
     }
 
-    int n;
 
-    printf("starting client %d \n", in);
-    while(true) {
+    char writeBuffer[BUFLEN];
+    char gameObjectBuffer[GAME_OBJECT_BUFFER];
+    char readBuffer[BUFLEN];
+    int sd = *((int *)arg);
+    struct	sockaddr_in server;
+    int udpSock;
+    udpSock = ConnectivityManager::getSocket(ConnectionType::UDP);
+    printf("\nTCP SOCKET: %d, UDP SOCK: %d\n", sd, udpSock);
+    const int i = 1;
+    if(setsockopt(udpSock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) < 0) {
+        perror("SET SOCK OPT FAILED");
+    };
+    // Bind an address to the socket
+	bzero((char *)&server, sizeof(struct sockaddr_in));
+	server.sin_family = AF_INET;
+	server.sin_port = htons(UDP_PORT);
+	server.sin_addr.s_addr = htonl(INADDR_ANY); // Accept connections from any client
 
-        memset(readBuffer, 0, BUFLEN);
-        n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
-        if (n < 0) {
-            printf("didnt recieve anything, recv error");
-            exit(1);
-        }
-        fflush(stdout);
-
-        char * tempBuf = readBuffer;
-        write_buffer(readBuffer);
-
-        Document playerDocument;
-        playerDocument.Parse(tempBuf);
-        Value& players = playerDocument["players"];
-        const Value& currentPlayer = players[0];
-            
-        memset(gameObjectBuffer, 0, BUFLEN);
-        update_json( gameObjectBuffer,&currentPlayer);
-        tCount[in]++;
+	if (bind(udpSock, (struct sockaddr *)&server, sizeof(server)) == -1)
+	{
+		perror("Can't bind name to socket");
+		exit(1);
+	}
+     
+    tcpEvent.events = EPOLLIN;
+    tcpEvent.data.fd = sd;
+    udpEvent.events = EPOLLIN;
+    udpEvent.data.fd = udpSock;
+    if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sd, &tcpEvent))
+    {
+        fprintf(stderr, "Failed to add tcp file descriptor to epoll\n");
+        close(epoll_fd);
+        exit(1);
     }
+    if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, udpSock, &udpEvent))
+    {
+        fprintf(stderr, "Failed to add udp file descriptor to epoll\n");
+        close(epoll_fd);
+        exit(1);
+    }
+    //send udp port to client
+    memset(writeBuffer, 0, sizeof(writeBuffer));
+    strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
+    while(start != 1) {
+        //do nothing
+    }
+    printf("\n\n SENDING PORT NUMBER: %s\n", writeBuffer);
+
+    write(sd, writeBuffer, sizeof(writeBuffer));
+
+	const int test = 1;
+    int n;
+	int bytes_to_read = BUFLEN;
+    int count = 1;
+    int client_no = -1;
+    int event_count;
+    while(true) {
+        memset(readBuffer, 0, BUFLEN);
+        //n = recvfrom (udpSock, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+
+        //printf("\nPolling for input...\n");
+        event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
+        //printf("%d ready events\n", event_count);
+        for(int i = 0; i < event_count; i++)
+        {
+            //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
+            n = recvfrom(events[i].data.fd, readBuffer, sizeof(readBuffer), 0, NULL, NULL);
+            
+            // printf("%zd bytes read.\n", bytes_read);
+            // read_buffer[bytes_read] = '\0';
+            // printf("Read '%s'\n", read_buffer);
+ 
+            if (n < 0) {
+                printf("didnt recieve anything, recv error");
+                exit(1);
+            }
+            if((strcmp(readBuffer, "stop")) == 0) {
+                printf("\n\nclient %d: %d\n", client_no, count);
+                fflush(stdout);
+                break;
+            }
+            char * tempBuf = readBuffer;
+            Document playerDocument;
+            playerDocument.Parse(tempBuf);
+            Value& players = playerDocument["players"];
+            const Value& currentPlayer = players[0];
+            if(client_no == -1) {
+                client_no = players[0]["id"].GetInt();
+            }
+            
+            memset(gameObjectBuffer, 0, BUFLEN);
+            update_json( gameObjectBuffer,&currentPlayer);
+            count++;
+        }
+
+    }
+    printf("close socket %d", sd);
     fflush(stdout);
+	close(sd);
+    close(udpSock);
     return NULL;
 }
 
@@ -189,34 +196,9 @@ int update_json(char* buffer, const Value *p) {
 
 int main (int argc, char **argv)
 {
+    pthread_t tid[MAX_CLIENTS];
 	int	sd, new_sd, client_len, port;
 	struct	sockaddr_in server, client;
-    struct epoll_event tcpEvent, events[MAX_EVENTS];
-    int epoll_fd;
-    int event_count;
-    int n;
-    int pid;
-    int tcpSockets[MAX_CLIENTS];
-
-    pthread_t tid[MAX_CLIENTS];
-    tStruct* infoArray[MAX_CLIENTS];
-    char readBuffer[BUFLEN];
-    char writeBuffer[BUFLEN];
-
-    memset(tCount, 0, (MAX_CLIENTS * sizeof(int)));
-
-    //Initialize circular buffer
-    updates = (struct circular*)malloc(sizeof(struct circular));
-    memset(updates, 0, sizeof(struct circular));
-    updates->writeIndex = 0;
-    updates->readIndex =0;
-    updates->bufferLength = 0;
-    updates->updateCount = 0;
-
-    //initialize infoArray
-    for(int i = 0; i < MAX_CLIENTS; i++) {
-        infoArray[i] = new tStruct;
-    }
 
 	switch(argc)
 	{
@@ -236,22 +218,6 @@ int main (int argc, char **argv)
         perror("init_semphore");
     }
     V(sem_id);
-
-    if((circular_sem = init_semaphore(sem_id, (key_t)12323)) == -1) {
-        perror("init circular semaphore");
-    }
-
-    if((pid = fork()) == -1) {
-        perror("Fork");
-    }
-
-    if(pid == 0) {
-        while(true) {
-            P(circular_sem);
-            read_buffer();
-        }
-    }
-
 	// Create a stream socket
 	sd = ConnectivityManager::getSocket(ConnectionType::TCP);
     const int j = 0;
@@ -270,12 +236,7 @@ int main (int argc, char **argv)
 		exit(1);
 	}
 
-    if((epoll_fd = epoll_create1(0)) == -1)
-    {
-        fprintf(stderr, "Failed to create epoll file descriptor\n");
-        exit(1);
-    }
-
+	// Listen for connections
 
 	// queue up to 5 connect requests
 	listen(sd, 5);
@@ -284,117 +245,31 @@ int main (int argc, char **argv)
 	while (true)
 	{
 		client_len= sizeof(client);
-		if ((tcpSockets[numOfClients] = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
+		if ((new_sd = accept (sd, (struct sockaddr *)&client, (socklen_t*)&client_len)) == -1)
 		{
 			perror("accept client\n");
 			exit(1);
-        }
-        printf("tcp socket created for client %d: %d\n", numOfClients, tcpSockets[numOfClients]);
-        tcpEvent.events = EPOLLIN;
-        tcpEvent.data.fd = tcpSockets[numOfClients];
-
-        if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, tcpSockets[numOfClients], &tcpEvent))
-        {
-            fprintf(stderr, "Failed to add tcp file descriptor to epoll\n");
-            close(epoll_fd);
-            exit(1);
-        }
-        
-        infoArray[numOfClients]->tcpSocket = tcpSockets[numOfClients];
-        //infoArray[numOfClients]->tcpSocket = udpSockets[numOfClients];
-        infoArray[numOfClients]->clientNo = numOfClients;
-        //send udpport to client
-        int client_number = numOfClients;
-        printf("Client number: %d" , client_number);
-
+		}
+        //socketList[i] = new_sd;
         printf(" Remote Address:  %s\n", inet_ntoa(client.sin_addr));
-        if( pthread_create(&tid[numOfClients], NULL, clientThread, &client_number) != 0 ) {
+        if( pthread_create(&tid[i++], NULL, clientThread, &new_sd) != 0 ) {
            printf("Failed to create thread\n");
         }
         UDP_PORT++;
         numOfClients++;
         if(numOfClients == MAX_CLIENTS) {
-            printf("MAX CLIENT AT: %d\n", numOfClients);
+            printf("MAX CLIENT AT: %d", numOfClients);
             fflush(stdout);
-            //signal all clients to start sending
-            for(int i = 0; i < numOfClients; i++) {
-                sprintf(writeBuffer,"%d", PORT_START+i);
-                printf("sent to client %d udp port %s on socket %d\n", i, writeBuffer, tcpSockets[i]);
-                if((send(tcpSockets[i], writeBuffer, sizeof(writeBuffer), 0)) < 0) {
-                    perror("send port number failed\n");
-                }
-            }
-            fflush(stdout);
+            start = 1;
             break;
         }
 	}
-
-    int numStopped = 0;
-    while(true) {
-        event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
-
-        for(int i = 0; i < event_count; i++)
-        {
-            //printf("Reading file descriptor '%d' -- ", events[i].data.fd);
-            n = recv(events[i].data.fd, readBuffer, sizeof(readBuffer),0);
-            if((strcmp(readBuffer, "stop")) == 0) {
-                printf("\n\nclient %d: stop received\n with count %d\n", events[i].data.fd, tCount[1]);
-                fflush(stdout);
-                
-                numStopped++;
-                break;
-            }
-        }
-        if(numStopped == MAX_CLIENTS) {
-            break;
-        }
+    for(int z = 0; z < MAX_CLIENTS; z++) {
+        pthread_join(tid[z], NULL);
     }
-
-    for(int i = 0; i < MAX_CLIENTS; i++) {
-            printf("%d\t%d\n", i, tCount[i]);
-    }
-
-    for(int x = 0; x < MAX_CLIENTS; x++) {
-        printf("Client #: %d\t%d\n", x, tCount[x]);
-        close(tcpSockets[x]);
-    }
-    kill(pid, SIGINT);
-    printf("Update Count: %d\n", updates->updateCount);
-    close(sd);
-    if(remove_semaphore(sem_id) == -1) {
-        perror("Error removing semaphore");
-    }
+	close(sd);
+    remove_semaphore(sem_id);
 	return(0);
-}
-
-int write_buffer(char* buffer) {
-    V(circular_sem);
-    strcpy(updates->buffer[updates->writeIndex], buffer);
-    set_wIndex();
-}
-//This function should update the JSON
-int read_buffer() {
-    printf("start of read_buffer");
-    //ADD STUFF FOR UPDATING JSON FILE HERE
-
-    //Increment variable after updating file
-    updates->updateCount++;
-    memset(updates->buffer[updates->readIndex], 0, BUFLEN);
-    set_rIndex();
-}
-void set_wIndex() {
-    if(updates->writeIndex == (MAX_CLIENTS - 1)) {
-        updates->writeIndex = 0;
-    } else {
-        updates->writeIndex++;
-    }
-}
-void set_rIndex() {
-    if(updates->readIndex == (MAX_CLIENTS -1)) {
-        updates->readIndex = 0;
-    } else {
-        updates->readIndex++;
-    }
 }
 
 int init_semaphore(int sem_id, key_t key) {
@@ -426,7 +301,7 @@ void P(int sem_id) {
     sembuf_ptr->sem_flg = SEM_UNDO;
 
     if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error P\n");
+	printf("semop error\n");
 }
 
 void V(int sem_id) {
@@ -438,9 +313,9 @@ struct sembuf *sembuf_ptr;
     sembuf_ptr->sem_flg = SEM_UNDO;
 
     if ((semop(sem_id,sembuf_ptr,1)) == -1)
-	printf("semop error V\n");
+	printf("semop error\n");
 }
 
 int remove_semaphore(int sem_id) {
-    return(semctl(sem_id, IPC_RMID, 0));
+    semctl(sem_id, IPC_RMID, 0);
 }

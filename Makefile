@@ -1,22 +1,57 @@
-CC=g++ -Wall -g
-CLIB= -lpthread
+CC=g++ -Wall -lpthread
 
-all: server client
+all: Server Client Client2
 
-server: tcpServer.o ConnectivityManager.o
-	$(CC) tcpServer.o ConnectivityManager.o -o server $(CLIB)
+Client: defaultTCP.o 
+	$(CC) -o Client defaultTCP.o
 
-client: tcpClient.o ConnectivityManager.o
-	$(CC) tcpClient.o ConnectivityManager.o -o client $(CLIB)
+Client2: defaultTCP2.o
+	$(CC) -o Client2 defaultTCP2.o
+
+Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
+	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
+
+$(CLIB)
 
 clean:
-	rm -f *.o *.bak server client
+	rm -f *.o core.* Server
+	rm -f *.o core.* Client
 
-tcpServer.o:
-	$(CC) -c tcpServer.cpp
+defaultTCP.o:
+	$(CC) -c defaultTCP.c
+defaultTCP2.o:
+	$(CC) -c defaultTCP2.c
+SelectServer.o:
+	$(CC) -c SelectServer.cpp
+ConnectivityManager.o:
+	$(CC) -c ConnectivityManager.cpp		
+LobbyManager.o:
+	$(CC) -c LobbyManager.cpp
+Lobby.o:
+	$(CC) -c Lobby.cpp
+Client.o:
+	$(CC) -c Client.cpp
 
-tcpClient.o:
-	$(CC) -c tcpClient.cpp
+# CC=g++ -Wall 
+# CLIB= -lpthread
 
-ConnectivityManager.o: 
-	$(CC) -c ConnectivityManager.cpp
+
+# test: main.o Lobby.o LobbyManager.o Client.o   
+# 	$(CC) -o test main.o Lobby.o LobbyManager.o Client.o  $(CLIB)
+
+
+# clean:
+# 	rm -f *.o *.bak test
+
+# main.o:
+# 	$(CC) -c main.cpp
+
+# Lobby.o:
+# 	$(CC) -c Lobby.cpp
+
+# LobbyManager.o:
+# 	$(CC) -c LobbyManager.cpp
+
+# client.o: 
+# 	$(CC) -c Client.cpp
+

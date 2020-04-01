@@ -1,14 +1,16 @@
 #include "Client.hpp"
 
 int Client::playerID = 0;
-Client::Client(string characterClass, int team, int socket, int UDPPort, int IP){
-    this->playerID = playerID++;
+Client::Client(int characterClass, int team, int socket, int UDPPort, int IP){
+    this->player_id = playerID++;
     this->characterClass = characterClass;
-    this->status = false;
+    this->status = "false";
     this->team = team;
     this->TCPSocket = socket;
     this->UDPPort = UDPPort;
     this->IP = IP;
+    this->lobby_id = -1;
+    this->loadingStatus = "false";
 }
 void Client::setLobby_Id(int lobbyID) {
     this->lobby_id = lobbyID;
@@ -57,13 +59,13 @@ void Client::setStatus(string status)
 }
 
 
-string Client::getCharacterClass()
+int Client::getCharacterClass()
 {
     return this->characterClass;
 }
 
 
-void Client::setCharacterClass(string characterClass)
+void Client::setCharacterClass(int characterClass)
 {
     this->characterClass = characterClass;
 }
@@ -74,8 +76,17 @@ int Client::getTeam()
     return this->team;
 }
 
-
 void Client::setTeam(int team)
 {
     this->team = team;
+}
+
+void Client::setLoadingStatus(string newStatus)
+{
+    this->loadingStatus = newStatus;
+}
+
+string Client::getLoadingStatus()
+{
+    return this->loadingStatus;
 }
