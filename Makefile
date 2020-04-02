@@ -1,4 +1,5 @@
-CC=g++ -Wall -lpthread
+CC=g++ -Wall
+LL=-lpthread
 
 all: Server Client Client2
 
@@ -9,7 +10,7 @@ Client2: defaultTCP2.o
 	$(CC) -o Client2 defaultTCP2.o
 
 Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
-	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
+	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o $(LL)
 
 $(CLIB)
 
