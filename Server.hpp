@@ -2,6 +2,7 @@
 
 #define SERVER_TCP_PORT 7000	// Default port
 #define BUFLEN	8096	//Buffer length
+#define UDP_BUFLEN 56
 #define TRUE	1
 #define LISTENQ	5
 #define MAXLINE 4096
@@ -25,5 +26,5 @@ struct circular {
     int bufferLength; /*can possibly be replaced with semaphore?*/
     int updateCount; /*temp variable to check if read_buffer() running as intended,
     		       should equal the total # of messages received*/
-    char buffer[CIRC_BUFFER_SIZE][BUFLEN];
+    char buffer[CIRC_BUFFER_SIZE][UDP_BUFLEN];
 };

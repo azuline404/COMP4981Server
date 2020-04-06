@@ -102,3 +102,7 @@ string Client::getLoadingStatus()
 struct sockaddr_in* Client::getUdpAddress() {
     return this->udpAddress;
 }
+
+void Client::setUDPAddress(sockaddr_in* address) {
+    udpAddress = address;
+}

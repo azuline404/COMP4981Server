@@ -22,6 +22,7 @@ class Client {
         void setLoadingStatus(string newStatus);
         string getLoadingStatus();
         struct sockaddr_in* getUdpAddress();
+        void setUDPAddress(sockaddr_in* address);
         void setUDPSocket(int udpSocket);
         int getUDPSocket();
         
