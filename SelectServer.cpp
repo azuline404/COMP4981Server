@@ -435,7 +435,7 @@ int main (int argc, char **argv)
         if (FD_ISSET(sockfd, &rset)) {
             bp = buf;
             bytes_to_read = BUFLEN;
-            n = recv (sockfd, buffer, 65000, 0);
+            n = recv (sockfd, buffer, BUFLEN, 0);
     		if (n == 0) { // connection closed by
             printf(" Remote Address:  %s closed connection\n", inet_ntoa(client_addr.sin_addr));
             close(sockfd);

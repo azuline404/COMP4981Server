@@ -68,7 +68,6 @@ string LobbyManager::getLobby(int id)
 
 	// Make a copy of the current client list
 	vector<Client*> currentClientList = currentLobby->getClientList();
-
 	// Iterate through the client list
 	for (auto it = currentClientList.begin(); it != currentClientList.end(); it++)
 	{
@@ -97,13 +96,15 @@ string LobbyManager::getLobby(int id)
 			break;
 		} 
 	}
+
 	allPlayersReady = currentLobby->getLobbyReady()? "true" : "false";
 	// Rest of the lobby information
 	lobbyJSON += "\"lobbyId\":\"" + to_string(currentLobby->getId()) + "\"," + 
 		"\"lobbyStatus\":\"" + currentLobby->getStatus() + "\"," +
-		"\"allPlayersReady\":\"" + allPlayersReady + "\"," + "\"lobbyOwnerName\":\"" + ownerName + "\"" + ",\"lobbyOwnerId\":\"" + to_string(lobbyOwner) + "\"" + ",\"numPlayers\":\"" + to_string(lobbyList[id]->getCurrentPlayers()) + "\"" +
+		"\"allPlayersReady\":\"" + allPlayersReady + "\"," + "\"lobbyOwnerName\":\"" + ownerName + 
+		"\"" + ",\"lobbyOwnerId\":\"" + to_string(lobbyOwner) + "\"" + ",\"numPlayers\":\"" 
+		+ to_string(currentLobby->getCurrentPlayers()) + "\"" +
 		"}";
-
 	return lobbyJSON;
 }
 
@@ -116,7 +117,6 @@ string LobbyManager::getLobby(int id)
  */
 void LobbyManager::deleteLobby(int lobbyId)
 {
-
 	for (auto it = lobbyList.begin(); it != lobbyList.end(); it++)
 	{
 		if ((*it)->getId() == lobbyId)

@@ -11,7 +11,7 @@ Lobby::Lobby(int lobbyOwner) {
 
 int Lobby::getCurrentPlayers() 
 {
-    return this->currentPlayers;
+    return clientList.size();
 }
 
 string Lobby::getStatus()
