@@ -34,7 +34,7 @@ static void SystemFatal(const char* );
 
 
 // Globals
-volatile int UDP_PORT = 12500;
+volatile int SERVER_UDP_PORT = 12500;
 LobbyManager * lobbyManager = new LobbyManager();
 Document document;
 std::vector<Client*>clientList;
@@ -204,7 +204,7 @@ void * send_updates(void * clientptr) {
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < clientList.size(); i++) {
 			int len = sizeof( clientList[i]->getUdpAddress());
-            if(sendto(clientList[i]->getUDPSocket(), currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientList[i]->getUdpAddress(), (socklen_t) len) < 0) {
+            if(sendto(clientList[i]->getUDPSocket(), currentGameState, strlen(currentGameState), 0,(struct sockaddr *)clientList[i]->getUdpAddress(), (socklen_t) len) < 0) {
                 perror("send to\n");
 		    }
         }
@@ -282,7 +282,7 @@ void * clientThread(void *info)
     udpServer.sin_addr.s_addr = htonl(INADDR_ANY); 
     //send udp port to client
     memset(writeBuffer, 0, sizeof(writeBuffer));
-    strcpy(writeBuffer, std::to_string(UDP_PORT).c_str());
+    strcpy(writeBuffer, std::to_string(SERVER_UDP_PORT).c_str());
     int udpSocket;
 	if ( (udpSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
         perror("socket creation failed"); 
@@ -302,7 +302,7 @@ void * clientThread(void *info)
     int n;
     int sentCount = 0;
     bool first = true;
-    printf("starting client %d \n", client->getPlayer_Id());
+    cout << "starting client " << client->getPlayer_Id() << endl;
     while(true) {
         memset(readBuffer, 0, BUFLEN);
         n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)client->getUdpAddress(), (socklen_t *) &len);
@@ -393,7 +393,7 @@ int main (int argc, char **argv)
     } 
  	FD_ZERO(&allset);
    	FD_SET(listen_sd, &allset);
-    int UDP_PORT = 12000;
+    int CLIENT_UDP_PORT = SERVER_UDP_PORT;
 	int sent;
 	while (TRUE)
 	{
@@ -454,7 +454,7 @@ int main (int argc, char **argv)
 			if (request == "connect") {
 				cout << "A new client has connected to the server!" << endl;
                 //  Create a new client, add it to the list, and return its id and UDP Port number.
-                Client * newClient = new Client(0, 0, new_sd, UDP_PORT++, atoi(inet_ntoa(client_addr.sin_addr)));
+                Client * newClient = new Client(0, 0, new_sd, CLIENT_UDP_PORT++, atoi(inet_ntoa(client_addr.sin_addr)));
 		        clientList.push_back(newClient);
 				Value::ConstMemberIterator itr = document.FindMember("username");
 				if (itr == document.MemberEnd()) {

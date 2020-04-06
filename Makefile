@@ -1,4 +1,4 @@
-CC=g++ -Wall
+CC=g++ -Wall -ggdb
 LL=-lpthread
 
 all: Server Client Client2
