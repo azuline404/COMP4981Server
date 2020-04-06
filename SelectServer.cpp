@@ -220,11 +220,12 @@ void broadcastLobbyUpdate(Lobby * lobby) {
 void * send_updates(void * clientptr) {
     int count = 0;
 	sem_wait(&clientsem);
-    while(true) {
+	
+    while(count < 1001) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < clientList.size(); i++) {
-			int len = sizeof( clientList[i]->getUdpAddress());
+			int len = sizeof( *(clientList[i]->getUdpAddress()));
 			struct sockaddr * cli = (struct sockaddr *) clientList[i]->getUdpAddress();
             if(sendto(clientList[i]->getUDPSocket(), currentGameState, sizeof(currentGameState), 0,(struct sockaddr *)clientList[i]->getUdpAddress(), (socklen_t) len) < 0) {
                 perror("send to\n");
@@ -232,7 +233,7 @@ void * send_updates(void * clientptr) {
         		printf("sent: %d \n ", count++);
 			}
         }
-        usleep(50000);
+        usleep(33000);
     }
 }
 
@@ -264,11 +265,10 @@ void * read_buffer(void *t_info) {
 	    Writer<StringBuffer> writer(outputBuffer);
     
 	    // gameState.Accept(writer);
-
-        strcpy(gameStateBuffer, outputBuffer.GetString());
 		
 		document.Accept(writer);
-		printf("READ_BUFFER: %s\n", outputBuffer.GetString());
+		//printf("READ_BUFFER: %s\n", outputBuffer.GetString());
+		strcpy(gameStateBuffer, outputBuffer.GetString());
         circularBuffer->updateCount++;
         pthread_mutex_unlock(&circularBufferLock);
         sem_post(&spacesem);
@@ -326,18 +326,22 @@ void * clientThread(void *info)
         exit(1);
     }
 	client->setUDPSocket(udpSocket);
-    int len = sizeof( client->getUdpAddress());
     int n;
     int testCount = 0; //remove later
     bool first = true;
-    printf("starting client %d \n", client->getPlayer_Id());
+	struct sockaddr_in cliaddr; 
+	memset(&cliaddr, 0, sizeof(cliaddr)); 
+	int len = sizeof(cliaddr);
+	
     while(true) {
         if (first) {
-			n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)client->getUdpAddress(), (socklen_t *) &len);
+			n = recvfrom(udpSocket, readBuffer, sizeof(readBuffer), 0, (struct sockaddr *)&cliaddr, (socklen_t *) &len);
 				if (n < 0) {
 					perror("didnt recieve anything, recv error");
 					exit(1);
 				} else {
+					client->setUDPAddress(&cliaddr);
+					struct sockaddr_in* test = client->getUdpAddress();
 					printf("client address saved!\n");
 					sem_post(&clientsem);
 				}

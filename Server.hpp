@@ -13,7 +13,7 @@
 #define  JOIN 4
 #define  LEAVE 5
 #define CIRC_BUFFER_SIZE 20
-#define GAME_OBJECT_BUFFER 65000
+#define GAME_OBJECT_BUFFER 40000
 
 class Server {
     public:
