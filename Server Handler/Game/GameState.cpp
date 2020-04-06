@@ -1,209 +1,235 @@
+/*
+*	NAME:			GameState
+*	DESC:			GameState is used to update the main Gamestate JSON File
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		
+*/
+
 // rapidjson/example/simpledom/simpledom.cpp`
 // This file creates the defualt json file/overwrite the defualt json file
-#include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/filewritestream.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
+#include "../rapidjson/document.h"
+#include "../rapidjson/filereadstream.h"
+#include "../rapidjson/filewritestream.h"
+#include "../rapidjson/writer.h"
+#include "../rapidjson/stringbuffer.h"
 #include <iostream>
 #include <cstdio>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <algorithm>
 
 using namespace rapidjson;
 using namespace std;
 
 #define READ_BUFF 65536
 
-// Client Lobby WALP
-void addClientToLobby(string client);
+void updateJSONFile(string clientObj);
 
-//
-void modifyArray(const char *object, const char *lookupKey, const char *lookupVal, const char *updateKey, string updateVal);
-void addToClient(const char *object, const char *json);
-void updateFile(Document d);
+void modifyJSONObject(Document &file, Document &client, string id);
+void addToJSONObject(Document &file, Document &client, string id);
+
+string getUpdatedJSONFile();
 void writeFile(const char *json);
-void defaultGameState();
-string getPlayersInfo();
-string getCrystalsInfo();
-void addInfoToFile();
+void copyFromDefaultFile();
 
 int main()
 {
-    // defaultGameState();
-    // readFile();
-
-    // modifyArray("Players", "PlayerName", "Henry", "PlayerClass", "Mage");
-
-    // char *client = "{\"PlayerName\" : \"Chi\", \"PlayerClass\" : \"Monk\"}";
-
-    addToClient("Players", "{\"PlayerName\" : \"Chi\", \"PlayerClass\" : \"Monk\"}");
-    // addToClient("Players", "PlayerClass", "Monk");
-
+    copyFromDefaultFile();
     return 0;
 }
 
-//  Adds client info in json format to the client (player) array
-void addToClient(const char *object, const char *json)
+/*
+*	NAME:			updateJSONFile
+*	DESC:			updateJSONFile is used modify the json file with the 
+*                   string recieved from the client
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
+void updateJSONFile(string clientObj)
 {
+    const char *  obj = clientObj.c_str();
+
+    // get JSON key
+    string id;
+    stringstream ss(clientObj);
+    ss >> id;
+    id.erase(0,2);
+    id.erase(id.length()-1, 1);
+
     // Open JSON and add to document object
-    FILE *fp = fopen("output.json", "r");
+    FILE *fp = fopen("GameState.json", "wb"); // non-Windows use "w"
     char readBuffer[READ_BUFF];
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
-    Document d, d2, temp;
-    d.ParseStream(is);
-    assert(d[object].IsArray());
-    fclose(fp);
+    Document file, // JSON File
+             client;// client temp
 
-    temp.Parse(json);
+    file.ParseStream(is);
+    assert(file.IsObject());
+    
+    client.Parse(obj);
+    assert(client.IsObject());
 
-    d2.SetObject();
-    Value json_objects(kObjectType);
-
-    assert(temp.IsObject());
-    Value &playerName = temp["PlayerName"];
-    Value &playerClass = temp["PlayerClass"];
-
-    assert(playerName.IsString());
-    assert(playerClass.IsString());
-
-    json_objects.AddMember("PlayerName", StringRef(playerName.GetString()), d2.GetAllocator());
-    json_objects.AddMember("PlayerClass", StringRef(playerClass.GetString()), d2.GetAllocator());
-
-    // Adds the json created to the end of the array
-    d[object].PushBack(json_objects, d2.GetAllocator());
-
-    // Writes updates to the file
+    // Check if id exist 
+    if (file.HasMember(id.c_str()))
+        modifyJSONObject(file, client, id);
+    else
+        addToJSONObject(file, client, id);
+   
+    // Write to JSON File
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    d.Accept(writer);
+    file.Accept(writer);
     writeFile(buffer.GetString());
 }
 
-// TODO : issue wiht updateVal , issue when assining
-void modifyArray(const char *object, const char *lookupKey, const char *lookupVal, const char *updateKey, string updateVal)
+/*
+*	NAME:			modifyJSONObject
+*	DESC:			modifyJSONObject is used to update  teh JSON File with
+*                   an existing id
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
+void modifyJSONObject(Document &file, Document &client, string id)
 {
-    FILE *fp = fopen("output.json", "rb"); // non-Windows use "r"
+    const char * health = "health";
+    const char * direction = "direction";
+    const char * position = "position";
+    const char * state = "state";
+
+    // Get Object from file with key of id
+    Value &fileInfo = file[id.c_str()];
+    assert(fileInfo.IsObject());
+
+    // Get Object of client 
+    Value &clientInfo = client[id.c_str()];
+    assert(clientInfo.IsObject());
+
+    // Update Health Value
+    if (clientInfo.HasMember(health)){
+        assert(clientInfo[health].IsInt());
+        fileInfo[health] = clientInfo[health];
+    }
+
+    // Update State Value
+    if (clientInfo.HasMember(state)){
+        assert(clientInfo[state].IsInt());
+        fileInfo[state] = clientInfo[state];
+    }
+
+    // Update Position Value
+    if (clientInfo.HasMember(position)){
+        assert(clientInfo[position].IsObject());
+        fileInfo[position] = clientInfo[position]; 
+    }
+
+    // Update Direction Value
+    if (clientInfo.HasMember(direction)){
+        assert(clientInfo[direction].IsObject());
+        fileInfo[direction] = clientInfo[direction]; 
+    }
+}
+
+/*
+*	NAME:			addToJSONObject
+*	DESC:			addToJSONObject is used to add a NEW Object to the JSON 
+*                   file. Value will have default values(0, {}) if updates 
+*                   received does not include those elements;
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
+void addToJSONObject(Document &file, Document &client, string id)
+{
+    const char * health = "health";
+    const char * direction = "direction";
+    const char * position = "position";
+    const char * state = "state";
+
+    int healthVal = 0;
+    int stateVal = 0;
+    Value positionVal(kObjectType);
+    Value directionVal(kObjectType);
+
+    Document::AllocatorType& allocator = file.GetAllocator();
+    
+    // Temporary value to store temporary Object
+    Value elements;
+    elements.SetObject();
+
+    Value &clientInfo = client[id.c_str()];
+    assert(clientInfo.IsObject());
+    
+    // Get Values from client
+    if (clientInfo.HasMember(health)){
+        assert(clientInfo[health].IsInt());
+        healthVal = clientInfo[health].GetInt();
+    }
+
+    if (clientInfo.HasMember(state)){
+        assert(clientInfo[state].IsInt());
+        stateVal = clientInfo[state].GetInt();
+    } 
+
+    if (clientInfo.HasMember(position)){
+        assert(clientInfo[position].IsObject());
+        positionVal = clientInfo[position];
+    }
+
+    if (clientInfo.HasMember(direction)){
+        assert(clientInfo[direction].IsObject());
+        directionVal = clientInfo[direction];
+    }
+
+    // Add values to temprary object
+    elements.AddMember(StringRef(health), healthVal, allocator);
+    elements.AddMember(StringRef(state), stateVal, allocator);
+    elements.AddMember(StringRef(position), positionVal, allocator);
+    elements.AddMember(StringRef(direction), directionVal, allocator);
+
+    // Add object to Main Object from file
+    file.AddMember(StringRef(id.c_str()), elements, allocator);    // not working
+}
+
+/*
+*	NAME:			getUpdatedJSONFile
+*	DESC:			getUpdatedJSONFile Reads JSON file and returns the file in string
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
+string getUpdatedJSONFile()
+{
+    FILE *fp = fopen("GameState.json", "wb"); // non-Windows use "w"
     Document d;
     char readBuffer[READ_BUFF];
 
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+
     d.ParseStream(is);
 
-    assert(d.IsObject());
-
-    assert(d.HasMember(object));
-    // object hold as array
-    assert(d[object].IsArray());
-
-    Value &players = d[object];
-
-    // Itreate through Players
-    for (rapidjson::Value::ValueIterator itr = players.Begin(); itr != players.End(); ++itr)
-    {
-        rapidjson::Value &attribute = *itr;
-        assert(attribute.IsObject()); // each attribute is an object
-
-        for (rapidjson::Value::MemberIterator itr2 = attribute.MemberBegin(); itr2 != attribute.MemberEnd(); ++itr2)
-        {
-            if (strcmp(itr2->name.GetString(), lookupKey) == 0 && strcmp(itr2->value.GetString(), lookupVal) == 0)
-            {
-                rapidjson::Value::MemberIterator changeKey = next(itr2, 1);
-                if (strcmp(changeKey->name.GetString(), updateKey) == 0)
-                {
-                    cout << "Pre modify: " << endl;
-                    cout << itr2->name.GetString() << " : " << itr2->value.GetString() << endl;
-                    cout << changeKey->name.GetString() << " : " << changeKey->value.GetString() << endl;
-
-                    // Modify
-                    changeKey->value = StringRef(updateVal.c_str());
-
-                    cout << "Post modify: " << endl;
-                    cout << itr2->name.GetString() << " : " << itr2->value.GetString() << endl;
-                    cout << changeKey->name.GetString() << " : " << changeKey->value.GetString() << endl;
-                }
-            }
-        }
-    }
-
-    // Writes updates to the file
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-
-    // // cout << buffer.GetString() << endl;
-    writeFile(buffer.GetString());
-
     fclose(fp);
+
+    return buffer.GetString();
 }
 
-// Creates the the json string of the default game state
-void defaultGameState()
-{
-    vector<string> topic = {"Players", "Crystal"};
-    string json_obj = "{";
-    string jsonPlayerList = getPlayersInfo();
-    string jsonCrystalList = getCrystalsInfo();
-
-    for (int t = 0; t < topic.size(); t++)
-    {
-        switch (t)
-        {
-        case 0:
-            // adds the player json
-            json_obj += "\"" + topic[t] + "\" : " + jsonPlayerList;
-            break;
-        case 1:
-            // adds the crystal json
-            json_obj += "\"" + topic[t] + "\" : " + jsonCrystalList;
-            break;
-        default:
-            break;
-        }
-
-        if ((t + 1) < topic.size())
-            json_obj += ",";
-    }
-    json_obj += "}";
-
-    const char *c = json_obj.c_str();
-    writeFile(c);
-}
-
-// Creates a json of the player list
-string getPlayersInfo()
-{
-    vector<string> player_name = {"Zafir", "Henry", "Tomas"};
-    vector<string> player_class = {"Knight", "Wizard", "Bard"};
-
-    string jsonPlayerList = "[";
-
-    for (int i; i < player_name.size(); i++)
-    {
-        jsonPlayerList += "{";
-
-        jsonPlayerList += "\"PlayerName\" : \"" + player_name[i] + "\",";
-        jsonPlayerList += "\"PlayerClass\" : \"" + player_class[i] + "\"";
-
-        jsonPlayerList += "}";
-    }
-    jsonPlayerList += "]";
-
-    return jsonPlayerList;
-}
-
-// Creates the Crystal Json and returns a string
-string getCrystalsInfo()
-{
-    string jsonCrystalList = "[{\"team\" : 1, \"health\": 500}, {\"team\": 2, \"health\" : 500}]";
-    return jsonCrystalList;
-}
-
-// Writes a cosnt char * to a json file
+/*
+*	NAME:			writeFile
+*	DESC:			writeFile is used to write the updates on the GameStateFile
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
 void writeFile(const char *json)
 {
-    FILE *fp = fopen("output.json", "wb"); // non-Windows use "w"
+    FILE *fp = fopen("GameState.json", "wb"); // non-Windows use "w"
     Document d;
     char writeBuffer[READ_BUFF];
 
@@ -217,22 +243,28 @@ void writeFile(const char *json)
     fclose(fp);
 }
 
-// Reads a json file
-void readFile()
+/*
+*	NAME:			copyFromDefaultFile
+*	DESC:			copyFromDefaultFile is used to copy the default game
+*                   to a temporary file
+*	DESIGNER:		Nicole Jingco
+*	PROGRAMMER:	    Nicole Jingco
+*	REVISIONS:		NA
+*/ 
+void copyFromDefaultFile()
 {
-    FILE *fp = fopen("output.json", "rb"); // non-Windows use "r"
+    FILE *fp = fopen("GameStateDefault.json", "rb"); // non-Windows use "r"
     Document d;
     char readBuffer[READ_BUFF];
 
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
     d.ParseStream(is);
+    fclose(fp);
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-    cout << buffer.GetString() << std::endl;
-
-    fclose(fp);
+    writeFile(buffer.GetString());
 }

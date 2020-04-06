@@ -1,0 +1,1578 @@
+[
+  {
+    "277": {
+      "id": 277,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": 8.1, "y": 17.58, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    }
+  },
+  {
+    "74": {
+      "id": 74,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -50.0, "y": 1.37, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "202": {
+      "id": 202,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 50.0, "y": 1.37, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    }
+  },
+  {
+    "111": {
+      "id": 111,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -15.41, "y": -19.11, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "183": {
+      "id": 183,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.986, "y": -18.869, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "214": {
+      "id": 214,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.5632305, "y": -18.62567, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "151": {
+      "id": 151,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.13953, "y": -18.3757954, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "145": {
+      "id": 145,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.7158394, "y": -18.1313457, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "89": {
+      "id": 89,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.6158009, "y": -18.0719452, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "4": {
+      "id": 4,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -11.4393177, "y": -16.7158489, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "67": {
+      "id": 67,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -11.0108471, "y": -16.4717216, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "20": {
+      "id": 20,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -10.5837965, "y": -16.22427, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "240": {
+      "id": 240,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -10.156745, "y": -15.97682, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "233": {
+      "id": 233,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -9.731314, "y": -15.728364, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "69": {
+      "id": 69,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -9.299475, "y": -15.4826031, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "185": {
+      "id": 185,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -8.867644, "y": -15.2333279, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "121": {
+      "id": 121,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -8.443, "y": -14.987, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "109": {
+      "id": 109,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -8.017182, "y": -14.7371035, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "189": {
+      "id": 189,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -7.59001064, "y": -14.4867859, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "29": {
+      "id": 29,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -7.15852, "y": -14.2376156, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "153": {
+      "id": 153,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -6.73350048, "y": -13.9897928, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "175": {
+      "id": 175,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -6.30315, "y": -13.7434092, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "217": {
+      "id": 217,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -5.882, "y": -13.5, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "219": {
+      "id": 219,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 21.099, "y": -16.706, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "262": {
+      "id": 262,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 20.682, "y": -16.458, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "33": {
+      "id": 33,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 20.4868259, "y": -16.3403454, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "156": {
+      "id": 156,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 18.0200634, "y": -14.920929, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "173": {
+      "id": 173,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 17.5960655, "y": -14.6658335, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "208": {
+      "id": 208,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 17.1734772, "y": -14.4161224, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "224": {
+      "id": 224,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 16.747, "y": -14.167, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "66": {
+      "id": 66,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 16.3256474, "y": -13.918992, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "265": {
+      "id": 265,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.8977633, "y": -13.672, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "114": {
+      "id": 114,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.4788752, "y": -13.4266949, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "135": {
+      "id": 135,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.0569038, "y": -13.1744337, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "212": {
+      "id": 212,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.6324387, "y": -12.9236689, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "267": {
+      "id": 267,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.2052813, "y": -12.6753473, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "38": {
+      "id": 38,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 13.7882938, "y": -12.429574, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "31": {
+      "id": 31,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 13.3603678, "y": -12.1872244, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "169": {
+      "id": 169,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 12.9333515, "y": -11.9380484, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "53": {
+      "id": 53,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 12.506937, "y": -11.6930866, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "231": {
+      "id": 231,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 12.082, "y": -11.443, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "76": {
+      "id": 76,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 11.6577044, "y": -11.1987171, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "155": {
+      "id": 155,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 11.2358284, "y": -10.952364, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "176": {
+      "id": 176,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 13.71, "y": -3.4, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "256": {
+      "id": 256,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.14, "y": -3.64, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "225": {
+      "id": 225,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.5695057, "y": -3.88622785, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "54": {
+      "id": 54,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.01, "y": -4.13, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "190": {
+      "id": 190,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.45, "y": -4.38, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "165": {
+      "id": 165,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.8784647, "y": -4.620478, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "103": {
+      "id": 103,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 16.29962, "y": -4.86822176, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "8": {
+      "id": 8,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 16.72922, "y": -5.10829258, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "117": {
+      "id": 117,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 17.1588173, "y": -5.360997, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "68": {
+      "id": 68,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 17.5850868, "y": -5.60400963, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "275": {
+      "id": 275,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 18.0182514, "y": -5.842942, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "268": {
+      "id": 268,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 18.44756, "y": -6.095476, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "174": {
+      "id": 174,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 32.0957031, "y": -5.18171024, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "75": {
+      "id": 75,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 32.52737, "y": -5.42766047, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "1": {
+      "id": 1,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 32.96, "y": -5.68, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "146": {
+      "id": 146,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 33.386, "y": -5.92865753, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "251": {
+      "id": 251,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 33.8173256, "y": -6.171275, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "211": {
+      "id": 211,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 34.2486458, "y": -6.427373, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "274": {
+      "id": 274,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 34.679966, "y": -6.66999054, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "184": {
+      "id": 184,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.1151, "y": -6.91, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "17": {
+      "id": 17,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.54206, "y": -7.15698338, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "83": {
+      "id": 83,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.97564, "y": -7.38822556, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "12": {
+      "id": 12,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 36.4092178, "y": -7.63391972, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "272": {
+      "id": 272,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 36.84, "y": -7.87, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "188": {
+      "id": 188,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 37.2579041, "y": -8.112188, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "210": {
+      "id": 210,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 37.6879044, "y": -8.362188, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "44": {
+      "id": 44,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 37.8, "y": -8.4, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "10": {
+      "id": 10,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 32.5637321, "y": 6.43839264, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "106": {
+      "id": 106,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 32.99606, "y": 6.6720314, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "36": {
+      "id": 36,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 33.4095573, "y": 6.911871, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "49": {
+      "id": 49,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 33.8228378, "y": 7.13781643, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "2": {
+      "id": 2,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 34.2490273, "y": 7.377548, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "78": {
+      "id": 78,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 34.6752167, "y": 7.617279, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "150": {
+      "id": 150,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.0880852, "y": 7.857011, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "223": {
+      "id": 223,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.5009575, "y": 8.110061, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "149": {
+      "id": 149,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 35.9271469, "y": 8.34979248, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "133": {
+      "id": 133,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 36.3533363, "y": 8.589523, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "258": {
+      "id": 258,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 36.7795258, "y": 8.829255, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "134": {
+      "id": 134,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 37.06733, "y": 9.003832, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "276": {
+      "id": 276,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.212389, "y": 19.6039963, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "37": {
+      "id": 37,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 14.6346836, "y": 19.8535347, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "113": {
+      "id": 113,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 15.05, "y": 20.08, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "273": {
+      "id": 273,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 9.40115, "y": 16.4683056, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "45": {
+      "id": 45,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 8.96408749, "y": 16.2321625, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "195": {
+      "id": 195,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 8.539696, "y": 15.9873219, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "158": {
+      "id": 158,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 8.098983, "y": 15.7424812, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "34": {
+      "id": 34,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 7.65826941, "y": 15.4813175, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "93": {
+      "id": 93,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 7.23387861, "y": 15.2528, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "40": {
+      "id": 40,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 6.793165, "y": 15.0242805, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "105": {
+      "id": 105,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": 6.35245228, "y": 14.795763, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "86": {
+      "id": 86,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -12.7942924, "y": 15.3157978, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "249": {
+      "id": 249,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.2211781, "y": 15.5446157, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "110": {
+      "id": 110,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.6488714, "y": 15.78, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "213": {
+      "id": 213,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.08, "y": 16.03, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "271": {
+      "id": 271,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.5008259, "y": 16.2670345, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "95": {
+      "id": 95,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.93, "y": 16.520092, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "73": {
+      "id": 73,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -15.36, "y": 16.76, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "125": {
+      "id": 125,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -15.7798071, "y": 17.0024319, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "270": {
+      "id": 270,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -16.2198277, "y": 17.2579269, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "269": {
+      "id": 269,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -16.6456528, "y": 17.4850349, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "60": {
+      "id": 60,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.0815048, "y": 17.73, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "144": {
+      "id": 144,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.5090675, "y": 17.9663658, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "112": {
+      "id": 112,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.923275, "y": 18.193512, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "191": {
+      "id": 191,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -18.2038612, "y": 18.367218, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "101": {
+      "id": 101,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -6.955, "y": 6.1760006, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "242": {
+      "id": 242,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -6.54177332, "y": 6.413783, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "235": {
+      "id": 235,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -6.123532, "y": 6.65475845, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "230": {
+      "id": 230,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -5.701725, "y": 6.89361954, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "92": {
+      "id": 92,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -5.27991867, "y": 7.132475, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "160": {
+      "id": 160,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -4.85811138, "y": 7.38149643, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "206": {
+      "id": 206,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -4.614175, "y": 7.52379227, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "62": {
+      "id": 62,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -11.1290617, "y": -7.22796249, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "79": {
+      "id": 79,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -11.561, "y": -7.472, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "59": {
+      "id": 59,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -11.99491, "y": -7.719183, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "81": {
+      "id": 81,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -12.4232254, "y": -7.96645927, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "200": {
+      "id": 200,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -12.8368626, "y": -7.84026527, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "138": {
+      "id": 138,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.2594929, "y": -7.59777832, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "264": {
+      "id": 264,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -13.68259, "y": -7.353319, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "46": {
+      "id": 46,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.1009846, "y": -7.104162, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "196": {
+      "id": 196,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.5193768, "y": -6.859705, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "126": {
+      "id": 126,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -14.9375267, "y": -6.61350441, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "228": {
+      "id": 228,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -15.355, "y": -6.365999, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "23": {
+      "id": 23,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -15.7648239, "y": -6.120077, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "220": {
+      "id": 220,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -16.179163, "y": -5.8754673, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "207": {
+      "id": 207,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -16.5984917, "y": -5.63085938, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "118": {
+      "id": 118,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.0278053, "y": -5.38625145, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "182": {
+      "id": 182,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.443, "y": -5.50399971, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "35": {
+      "id": 35,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -17.827, "y": -5.724001, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "221": {
+      "id": 221,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -33.693, "y": 9.862, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "88": {
+      "id": 88,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -34.124, "y": 10.108, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "259": {
+      "id": 259,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -34.5005531, "y": 10.3309908, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "180": {
+      "id": 180,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -27.01272, "y": -6.769842, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "198": {
+      "id": 198,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -27.446, "y": -7.01300049, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "193": {
+      "id": 193,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -27.875, "y": -7.263159, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "102": {
+      "id": 102,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -28.3074913, "y": -7.51349068, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "177": {
+      "id": 177,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -28.7327843, "y": -7.75902367, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "18": {
+      "id": 18,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -29.1624641, "y": -8.00894, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "13": {
+      "id": 13,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -29.589, "y": -8.255999, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "61": {
+      "id": 61,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -30.0230026, "y": -8.501001, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "159": {
+      "id": 159,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -30.4560013, "y": -8.746, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "245": {
+      "id": 245,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -30.8860016, "y": -8.990999, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "227": {
+      "id": 227,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -31.3070717, "y": -9.24091148, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "71": {
+      "id": 71,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -31.7352753, "y": -9.487326, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "139": {
+      "id": 139,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -32.15539, "y": -9.733744, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "154": {
+      "id": 154,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -32.58326, "y": -9.984413, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "243": {
+      "id": 243,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 100,
+      "position": { "x": -33.01639, "y": -10.231432, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "127": {
+      "id": 127,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": -5.65423632, "y": -18.2982769, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "122": {
+      "id": 122,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": 7.806196, "y": -21.627737, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "3": {
+      "id": 3,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": -18.0645943, "y": -10.549551, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "205": {
+      "id": 205,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": 24.0150452, "y": 12.81827, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "171": {
+      "id": 171,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": -5.84286928, "y": 21.935009, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "28": {
+      "id": 28,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": 8.612465, "y": 21.7412453, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "254": {
+      "id": 254,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": 25.7966824, "y": -11.4499083, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    },
+    "77": {
+      "id": 77,
+      "parentID": 0,
+      "team": 0,
+      "type": 0,
+      "state": 0,
+      "health": 0,
+      "position": { "x": -21.2973289, "y": 11.8122482, "z": 0.0 },
+      "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
+    }
+  }
+]
