@@ -1,13 +1,10 @@
 CC=g++ -Wall -ggdb
 LL=-lpthread
 
-all: Server Client Client2
+all: Server Client 
 
-Client: defaultTCP.o 
-	$(CC) -o Client defaultTCP.o
-
-Client2: defaultTCP2.o
-	$(CC) -o Client2 defaultTCP2.o
+Client: Client.o
+	$(CC) -o Client Client.o $(LL)
 
 Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
 	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o $(LL)
@@ -18,20 +15,16 @@ clean:
 	rm -f *.o core.* Server
 	rm -f *.o core.* Client
 
-defaultTCP.o:
-	$(CC) -c defaultTCP.c
-defaultTCP2.o:
-	$(CC) -c defaultTCP2.c
 SelectServer.o:
-	$(CC) -c SelectServer.cpp
+	$(CC) -c ./GameScene/SelectServer.cpp
 ConnectivityManager.o:
-	$(CC) -c ConnectivityManager.cpp		
+	$(CC) -c ./Networking/ConnectivityManager.cpp		
 LobbyManager.o:
-	$(CC) -c LobbyManager.cpp
+	$(CC) -c ./LobbyScene/LobbyManager.cpp
 Lobby.o:
-	$(CC) -c Lobby.cpp
+	$(CC) -c ./LobbyScene/Lobby.cpp
 Client.o:
-	$(CC) -c Client.cpp
+	$(CC) -c ./LobbyScene/Client.cpp
 
 # CC=g++ -Wall 
 # CLIB= -lpthread

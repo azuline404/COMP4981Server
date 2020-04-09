@@ -1,30 +1,5 @@
 #include "Server.hpp"
-#include <iostream>
-#include <stdio.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <errno.h>
-#include <strings.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "ConnectivityManager.hpp"
-#include "rapidjson/filewritestream.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/document.h"
-#include <thread>
-#include <algorithm>
-#include <unistd.h>
-#include <array>
-#include <pthread.h>
-#include <signal.h>
-#include <semaphore.h>
+
 
 using namespace std;
 using namespace rapidjson;
