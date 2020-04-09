@@ -8,31 +8,7 @@
 
 // rapidjson/example/simpledom/simpledom.cpp`
 // This file creates the defualt json file/overwrite the defualt json file
-#include "../rapidjson/document.h"
-#include "../rapidjson/filereadstream.h"
-#include "../rapidjson/filewritestream.h"
-#include "../rapidjson/writer.h"
-#include "../rapidjson/stringbuffer.h"
-#include <iostream>
-#include <cstdio>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-
-using namespace rapidjson;
-using namespace std;
-
-#define READ_BUFF 65536
-
-string updateJSONFile(string clientObj);
-
-string modifyJSONObject(Document &file, Document &client, string id);
-string addToJSONObject(Document &file, Document &client, string id);
-
-string getUpdatedJSONFile();
-void writeFile(const char *json);
-void copyFromDefaultFile();
+#include "GameState.hpp"
 
 /*
 *	NAME:			updateJSONFile
@@ -73,13 +49,12 @@ string updateJSONFile(string clientObj)
     else
         update  = addToJSONObject(file, client, id);
    
-    cout << update << endl;
-
     // Write to JSON File
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     file.Accept(writer);
     writeFile(buffer.GetString());
+    return update;
 }
 
 /*
@@ -92,14 +67,6 @@ string updateJSONFile(string clientObj)
 */ 
 string modifyJSONObject(Document &file, Document &client, string id)
 { 
-    const char * parentID = "parentID";
-    const char * team = "team";
-    const char * type = "type";
-    const char * health = "health";
-    const char * direction = "direction";
-    const char * position = "position";
-    const char * state = "state";
-
     // Get Object from file with key of id
     Value &fileInfo = file[id.c_str()];
     assert(fileInfo.IsObject());
@@ -108,45 +75,45 @@ string modifyJSONObject(Document &file, Document &client, string id)
     Value &clientInfo = client[id.c_str()];
     assert(clientInfo.IsObject());
 
-    // Update Health Value
-    if (clientInfo.HasMember(parentID)){
-        assert(clientInfo[parentID].IsInt());
-        fileInfo[parentID] = clientInfo[parentID];
+    // Update ParentID Value
+    if (clientInfo.HasMember(PARENTID)){
+        assert(clientInfo[PARENTID].IsInt());
+        fileInfo[PARENTID] = clientInfo[PARENTID];
     }
 
-    // Update Health Value
-    if (clientInfo.HasMember(team)){
-        assert(clientInfo[team].IsInt());
-        fileInfo[team] = clientInfo[team];
+    // Update Team Value
+    if (clientInfo.HasMember(TEAM)){
+        assert(clientInfo[TEAM].IsInt());
+        fileInfo[TEAM] = clientInfo[TEAM];
     }
 
-    // Update Health Value
-    if (clientInfo.HasMember(type)){
-        assert(clientInfo[type].IsInt());
-        fileInfo[type] = clientInfo[type];
+    // Update Type Value
+    if (clientInfo.HasMember(TYPE)){
+        assert(clientInfo[TYPE].IsInt());
+        fileInfo[TYPE] = clientInfo[TYPE];
     }
     // Update Health Value
-    if (clientInfo.HasMember(health)){
-        assert(clientInfo[health].IsInt());
-        fileInfo[health] = clientInfo[health];
+    if (clientInfo.HasMember(HEALTH)){
+        assert(clientInfo[HEALTH].IsInt());
+        fileInfo[HEALTH] = clientInfo[HEALTH];
     }
 
     // Update State Value
-    if (clientInfo.HasMember(state)){
-        assert(clientInfo[state].IsInt());
-        fileInfo[state] = clientInfo[state];
+    if (clientInfo.HasMember(STATE)){
+        assert(clientInfo[STATE].IsInt());
+        fileInfo[STATE] = clientInfo[STATE];
     }
 
     // Update Position Value
-    if (clientInfo.HasMember(position)){
-        assert(clientInfo[position].IsObject());
-        fileInfo[position] = clientInfo[position]; 
+    if (clientInfo.HasMember(POSITION)){
+        assert(clientInfo[POSITION].IsObject());
+        fileInfo[POSITION] = clientInfo[POSITION]; 
     }
 
     // Update Direction Value
-    if (clientInfo.HasMember(direction)){
-        assert(clientInfo[direction].IsObject());
-        fileInfo[direction] = clientInfo[direction]; 
+    if (clientInfo.HasMember(DIRECTION)){
+        assert(clientInfo[DIRECTION].IsObject());
+        fileInfo[DIRECTION] = clientInfo[DIRECTION]; 
     }
 
     StringBuffer sb;
@@ -167,15 +134,6 @@ string modifyJSONObject(Document &file, Document &client, string id)
 */ 
 string addToJSONObject(Document &file, Document &client, string id)
 {
-    const char * parentID = "parentID";
-    const char * team = "team";
-    const char * type = "type";
-    const char * health = "health";
-    const char * direction = "direction";
-    const char * position = "position";
-    const char * state = "state";
-  
-
     int parentIDVal = 0;
     int teamVal = 0;
     int typeVal = 0;
@@ -194,46 +152,46 @@ string addToJSONObject(Document &file, Document &client, string id)
     assert(clientInfo.IsObject());
     
     // Get Values from client
-    if (clientInfo.HasMember(parentID)){
-        assert(clientInfo[parentID].IsInt());
-        parentIDVal = clientInfo[parentID].GetInt();
+    if (clientInfo.HasMember(PARENTID)){
+        assert(clientInfo[PARENTID].IsInt());
+        parentIDVal = clientInfo[PARENTID].GetInt();
     }
-    if (clientInfo.HasMember(team)){
-        assert(clientInfo[team].IsInt());
-        teamVal = clientInfo[team].GetInt();
+    if (clientInfo.HasMember(TEAM)){
+        assert(clientInfo[TEAM].IsInt());
+        teamVal = clientInfo[TEAM].GetInt();
     }
-    if (clientInfo.HasMember(type)){
-        assert(clientInfo[type].IsInt());
-        typeVal = clientInfo[type].GetInt();
+    if (clientInfo.HasMember(TYPE)){
+        assert(clientInfo[TYPE].IsInt());
+        typeVal = clientInfo[TYPE].GetInt();
     }
-    if (clientInfo.HasMember(health)){
-        assert(clientInfo[health].IsInt());
-        healthVal = clientInfo[health].GetInt();
+    if (clientInfo.HasMember(HEALTH)){
+        assert(clientInfo[HEALTH].IsInt());
+        healthVal = clientInfo[HEALTH].GetInt();
     }
 
-    if (clientInfo.HasMember(state)){
-        assert(clientInfo[state].IsInt());
-        stateVal = clientInfo[state].GetInt();
+    if (clientInfo.HasMember(STATE)){
+        assert(clientInfo[STATE].IsInt());
+        stateVal = clientInfo[STATE].GetInt();
     } 
 
-    if (clientInfo.HasMember(position)){
-        assert(clientInfo[position].IsObject());
-        positionVal = clientInfo[position];
+    if (clientInfo.HasMember(POSITION)){
+        assert(clientInfo[POSITION].IsObject());
+        positionVal = clientInfo[POSITION];
     }
 
-    if (clientInfo.HasMember(direction)){
-        assert(clientInfo[direction].IsObject());
-        directionVal = clientInfo[direction];
+    if (clientInfo.HasMember(DIRECTION)){
+        assert(clientInfo[DIRECTION].IsObject());
+        directionVal = clientInfo[DIRECTION];
     }
 
     // Add values to temprary object
-    elements.AddMember(StringRef(parentID), parentIDVal, allocator);
-    elements.AddMember(StringRef(team), teamVal, allocator);
-    elements.AddMember(StringRef(type), typeVal, allocator);
-    elements.AddMember(StringRef(health), healthVal, allocator);
-    elements.AddMember(StringRef(state), stateVal, allocator);
-    elements.AddMember(StringRef(position), positionVal, allocator);
-    elements.AddMember(StringRef(direction), directionVal, allocator);
+    elements.AddMember(StringRef(PARENTID), parentIDVal, allocator);
+    elements.AddMember(StringRef(TEAM), teamVal, allocator);
+    elements.AddMember(StringRef(TYPE), typeVal, allocator);
+    elements.AddMember(StringRef(HEALTH), healthVal, allocator);
+    elements.AddMember(StringRef(STATE), stateVal, allocator);
+    elements.AddMember(StringRef(POSITION), positionVal, allocator);
+    elements.AddMember(StringRef(DIRECTION), directionVal, allocator);
 
     // Add object to Main Object from file
     file.AddMember(StringRef(id.c_str()), elements, allocator);    // not working

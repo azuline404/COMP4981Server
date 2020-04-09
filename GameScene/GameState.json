@@ -27,21 +27,21 @@
     "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   },
   "111": {
-    "parentID": 0,
+    "parentID": 3,
     "team": 0,
     "type": 0,
     "state": 0,
-    "health": 1000,
+    "health": 888,
     "position": { "x": -15.41, "y": -19.11, "z": 0.0 },
     "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   },
-  "662": {
-    "parentID": 0,
-    "team": 7,
-    "type": 7,
-    "health": 0,
+  "63": {
+    "parentID": 3,
+    "team": 0,
+    "type": 0,
+    "health": 888,
     "state": 0,
-    "position": { "x": 8.1, "y": 19, "z": 0.0 },
+    "position": { "x": -15.41, "y": -19.11, "z": 0.0 },
     "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   }
 }
