@@ -25,42 +25,36 @@ using namespace std;
 
 #define READ_BUFF 65536
 
-void updateJSONFile(string clientObj);
+string updateJSONFile(string clientObj);
 
-void modifyJSONObject(Document &file, Document &client, string id);
-void addToJSONObject(Document &file, Document &client, string id);
+string modifyJSONObject(Document &file, Document &client, string id);
+string addToJSONObject(Document &file, Document &client, string id);
 
 string getUpdatedJSONFile();
 void writeFile(const char *json);
 void copyFromDefaultFile();
 
-int main()
-{
-    copyFromDefaultFile();
-    return 0;
-}
-
 /*
 *	NAME:			updateJSONFile
 *	DESC:			updateJSONFile is used modify the json file with the 
-*                   string recieved from the client
+*                   string recieved from the client and returns the client info update
 *	DESIGNER:		Nicole Jingco
 *	PROGRAMMER:	    Nicole Jingco
 *	REVISIONS:		NA
 */ 
-void updateJSONFile(string clientObj)
+string updateJSONFile(string clientObj)
 {
     const char *  obj = clientObj.c_str();
-
+    string update;
     // get JSON key
     string id;
     stringstream ss(clientObj);
     ss >> id;
     id.erase(0,2);
-    id.erase(id.length()-1, 1);
+    id.erase(id.length()-2, 3);
 
     // Open JSON and add to document object
-    FILE *fp = fopen("GameState.json", "wb"); // non-Windows use "w"
+    FILE *fp = fopen("GameState.json", "rb"); // non-Windows use "w"
     char readBuffer[READ_BUFF];
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
@@ -75,10 +69,12 @@ void updateJSONFile(string clientObj)
 
     // Check if id exist 
     if (file.HasMember(id.c_str()))
-        modifyJSONObject(file, client, id);
+        update = modifyJSONObject(file, client, id);
     else
-        addToJSONObject(file, client, id);
+        update  = addToJSONObject(file, client, id);
    
+    cout << update << endl;
+
     // Write to JSON File
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -89,13 +85,16 @@ void updateJSONFile(string clientObj)
 /*
 *	NAME:			modifyJSONObject
 *	DESC:			modifyJSONObject is used to update  teh JSON File with
-*                   an existing id
+*                   an existing id and returns the object
 *	DESIGNER:		Nicole Jingco
 *	PROGRAMMER:	    Nicole Jingco
 *	REVISIONS:		NA
 */ 
-void modifyJSONObject(Document &file, Document &client, string id)
-{
+string modifyJSONObject(Document &file, Document &client, string id)
+{ 
+    const char * parentID = "parentID";
+    const char * team = "team";
+    const char * type = "type";
     const char * health = "health";
     const char * direction = "direction";
     const char * position = "position";
@@ -109,6 +108,23 @@ void modifyJSONObject(Document &file, Document &client, string id)
     Value &clientInfo = client[id.c_str()];
     assert(clientInfo.IsObject());
 
+    // Update Health Value
+    if (clientInfo.HasMember(parentID)){
+        assert(clientInfo[parentID].IsInt());
+        fileInfo[parentID] = clientInfo[parentID];
+    }
+
+    // Update Health Value
+    if (clientInfo.HasMember(team)){
+        assert(clientInfo[team].IsInt());
+        fileInfo[team] = clientInfo[team];
+    }
+
+    // Update Health Value
+    if (clientInfo.HasMember(type)){
+        assert(clientInfo[type].IsInt());
+        fileInfo[type] = clientInfo[type];
+    }
     // Update Health Value
     if (clientInfo.HasMember(health)){
         assert(clientInfo[health].IsInt());
@@ -132,24 +148,37 @@ void modifyJSONObject(Document &file, Document &client, string id)
         assert(clientInfo[direction].IsObject());
         fileInfo[direction] = clientInfo[direction]; 
     }
+
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    fileInfo.Accept(writer);
+    return "{\"" + id + "\": " + sb.GetString() + "}";
+
 }
 
 /*
 *	NAME:			addToJSONObject
 *	DESC:			addToJSONObject is used to add a NEW Object to the JSON 
 *                   file. Value will have default values(0, {}) if updates 
-*                   received does not include those elements;
+*                   received does not include those elements and returns the object
 *	DESIGNER:		Nicole Jingco
 *	PROGRAMMER:	    Nicole Jingco
 *	REVISIONS:		NA
 */ 
-void addToJSONObject(Document &file, Document &client, string id)
+string addToJSONObject(Document &file, Document &client, string id)
 {
+    const char * parentID = "parentID";
+    const char * team = "team";
+    const char * type = "type";
     const char * health = "health";
     const char * direction = "direction";
     const char * position = "position";
     const char * state = "state";
+  
 
+    int parentIDVal = 0;
+    int teamVal = 0;
+    int typeVal = 0;
     int healthVal = 0;
     int stateVal = 0;
     Value positionVal(kObjectType);
@@ -165,6 +194,18 @@ void addToJSONObject(Document &file, Document &client, string id)
     assert(clientInfo.IsObject());
     
     // Get Values from client
+    if (clientInfo.HasMember(parentID)){
+        assert(clientInfo[parentID].IsInt());
+        parentIDVal = clientInfo[parentID].GetInt();
+    }
+    if (clientInfo.HasMember(team)){
+        assert(clientInfo[team].IsInt());
+        teamVal = clientInfo[team].GetInt();
+    }
+    if (clientInfo.HasMember(type)){
+        assert(clientInfo[type].IsInt());
+        typeVal = clientInfo[type].GetInt();
+    }
     if (clientInfo.HasMember(health)){
         assert(clientInfo[health].IsInt());
         healthVal = clientInfo[health].GetInt();
@@ -186,6 +227,9 @@ void addToJSONObject(Document &file, Document &client, string id)
     }
 
     // Add values to temprary object
+    elements.AddMember(StringRef(parentID), parentIDVal, allocator);
+    elements.AddMember(StringRef(team), teamVal, allocator);
+    elements.AddMember(StringRef(type), typeVal, allocator);
     elements.AddMember(StringRef(health), healthVal, allocator);
     elements.AddMember(StringRef(state), stateVal, allocator);
     elements.AddMember(StringRef(position), positionVal, allocator);
@@ -193,6 +237,11 @@ void addToJSONObject(Document &file, Document &client, string id)
 
     // Add object to Main Object from file
     file.AddMember(StringRef(id.c_str()), elements, allocator);    // not working
+    
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    file[id.c_str()].Accept(writer);
+    return "{\"" + id + "\": " + sb.GetString() + "}";
 }
 
 /*
@@ -268,3 +317,4 @@ void copyFromDefaultFile()
 
     writeFile(buffer.GetString());
 }
+

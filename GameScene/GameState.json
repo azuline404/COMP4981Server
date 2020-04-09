@@ -4,8 +4,8 @@
     "team": 0,
     "type": 0,
     "state": 0,
-    "health": 0,
-    "position": { "x": 8.1, "y": 17.58, "z": 0.0 },
+    "health": 500,
+    "position": { "x": 8.1, "y": 19, "z": 0.0 },
     "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   },
   "74": {
@@ -35,10 +35,13 @@
     "position": { "x": -15.41, "y": -19.11, "z": 0.0 },
     "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   },
-  "999": {
-    "health": 88,
+  "662": {
+    "parentID": 0,
+    "team": 7,
+    "type": 7,
+    "health": 0,
     "state": 0,
-    "position": { "x": -50.0, "y": 5.37, "z": 69.0 },
-    "direction": {}
+    "position": { "x": 8.1, "y": 19, "z": 0.0 },
+    "direction": { "x": 0.0, "y": 0.0, "z": 0.0 }
   }
 }
