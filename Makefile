@@ -1,10 +1,7 @@
 CC=g++ -Wall -ggdb
 LL=-lpthread
 
-all: Server Client 
-
-
-Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o Main.o
+Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o 
 	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o $(LL)
 
 $(CLIB)
@@ -13,8 +10,6 @@ clean:
 	rm -f *.o core.* Server
 	rm -f *.o core.* Client
 
-Main.o:
-	$(CC) -c ./LobbyScene/main.cpp
 SelectServer.o:
 	$(CC) -c ./GameScene/SelectServer.cpp
 ConnectivityManager.o:
