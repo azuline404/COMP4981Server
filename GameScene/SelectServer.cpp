@@ -196,7 +196,7 @@ void * send_updates(void * clientptr) {
     int count = 0;
 	sem_wait(&clientsem);
 	
-    while(count < 1001) {
+    while(count < 2001) {
         char currentGameState[GAME_OBJECT_BUFFER];
         strcpy(currentGameState, gameStateBuffer);
         for(int i = 0; i < clientList.size(); i++) {
@@ -243,7 +243,9 @@ void * read_buffer(void *t_info) {
 		
 		document.Accept(writer);
 		//printf("READ_BUFFER: %s\n", outputBuffer.GetString());
+		memset(gameStateBuffer, 0, strlen(gameStateBuffer));
 		strcpy(gameStateBuffer, outputBuffer.GetString());
+		gameStateBuffer[outputBuffer.GetSize()] = '\n';
         circularBuffer->updateCount++;
         pthread_mutex_unlock(&circularBufferLock);
         sem_post(&spacesem);
@@ -263,9 +265,7 @@ int write_buffer(char* buffer) {
     pthread_mutex_unlock(&writeIndexLock);
     sem_post(&writeIndex);
     pthread_mutex_unlock(&circularBufferLock);
-	printf("before copying to circular buffer\n");
     strcpy(circularBuffer->buffer[ circularBuffer->writeIndex], buffer);
-	printf("after copying to circular buffer\n");
     sem_post(&countsem);
 
     return 1;
@@ -329,7 +329,7 @@ void * clientThread(void *info)
 				}
 		}
     
-        printf("received no: %d\n", ++testCount);
+        printf("received from client %d: %d\n", client->getPlayer_Id(), ++testCount);
         write_buffer(readBuffer);
     }
     fflush(stdout);
