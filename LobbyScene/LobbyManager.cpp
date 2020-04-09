@@ -1,8 +1,8 @@
 /*
  *  NAME:            LobbyManager.cpp
  *  DESC:            This class 
- *  DESIGNER:        Ash Ketchum
- *  PROGRAMMER:      Pikachu
+ *  DESIGNER:        Tommy C, Nicole J & Chirag F
+ *  PROGRAMMER:      Nicole J & Chirag F
  *  REVISIONS:       Nicole J &Chirag F (March 10, 2020):
  *						- getlobyList() &getLobby() functionality implemented
  */
@@ -13,7 +13,7 @@
  *   NAME:            getLobbyList()
  *   DESC:            This function returns a string of the lobby list information in 
  *					  json format
- *   DESIGNER:        Ash Ketchum
+ *   DESIGNER:        Nicole J & Chirag F
  *   PROGRAMMER:      Nicole J & Chirag F
  *   REVISIONS:       Tommy Chang 3/13/2020
  * 						- changed lobbyId and userId to strings, and character class key
@@ -46,7 +46,7 @@ string LobbyManager::getLobbyList()
  *   NAME:            getLobby(int id)
  *   DESC:            This function returns the lobby information including the players 
  *					  given the owners id.
- *   DESIGNER:        Ash Ketchum
+ *   DESIGNER:        Nicole J & Chirag F
  *   PROGRAMMER:      Nicole J & Chirag F
  *   REVISIONS:       Nicole J (March 11, 2020):
  *						- Fixed bug with the string in formatter in the loop 	
@@ -110,7 +110,7 @@ string LobbyManager::getLobby(int id)
 /*
  *   NAME:            deleteLobby(int lobbyId)
  *   DESC:            This function deletes a lobby from the lobbyList
- *   DESIGNER:        Ash Ketchum
+ *   DESIGNER:        Tommy C
  *   PROGRAMMER:      Tommy C 
  *   REVISIONS:       NA										
  */
@@ -142,7 +142,7 @@ int LobbyManager::createLobby(Client *client)
 /*
  *   NAME:            getLobbyObject(int id)
  *   DESC:            This function returns the game lobby object given an id
- *   DESIGNER:        Ash Ketchum
+ *   DESIGNER:        Tommy C
  *   PROGRAMMER:      Tommy C 
  *   REVISIONS:       NA										
  */
