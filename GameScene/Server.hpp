@@ -28,7 +28,7 @@
 
 #define SERVER_TCP_PORT 7000	// Default port
 #define BUFLEN	8096	//Buffer length
-#define UDP_BUFLEN 56
+#define UDP_BUFLEN 100
 #define TRUE	1
 #define LISTENQ	5
 #define MAXLINE 4096
@@ -39,7 +39,7 @@
 #define  JOIN 4
 #define  LEAVE 5
 #define CIRC_BUFFER_SIZE 20
-#define GAME_OBJECT_BUFFER 40000
+#define GAME_OBJECT_BUFFER 20000
 
 class Server {
     public:
