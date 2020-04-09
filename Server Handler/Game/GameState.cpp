@@ -36,7 +36,18 @@ void copyFromDefaultFile();
 
 int main()
 {
-    copyFromDefaultFile();
+    string test = "{\"123\" : {\n"
+"    \"parentID\": 0,\n"
+"    \"team\": 0,\n"
+"    \"type\": 0,\n"
+"    \"state\": 5,\n"
+"    \"health\": 0,\n"
+"    \"position\": { \"x\": 8.1, \"y\": 17.58, \"z\": 0.0 },\n"
+"    \"direction\": { \"x\": 0.0, \"y\": 0.0, \"z\": 0.0 }\n"
+"  }}";
+    
+    updateJSONFile(test);
+    // copyFromDefaultFile();
     return 0;
 }
 
@@ -60,7 +71,7 @@ void updateJSONFile(string clientObj)
     id.erase(id.length()-1, 1);
 
     // Open JSON and add to document object
-    FILE *fp = fopen("GameState.json", "wb"); // non-Windows use "w"
+    FILE *fp = fopen("GameState.json", "rb"); // non-Windows use "w"
     char readBuffer[READ_BUFF];
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
@@ -79,6 +90,7 @@ void updateJSONFile(string clientObj)
     else
         addToJSONObject(file, client, id);
    
+
     // Write to JSON File
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -96,6 +108,7 @@ void updateJSONFile(string clientObj)
 */ 
 void modifyJSONObject(Document &file, Document &client, string id)
 {
+
     const char * health = "health";
     const char * direction = "direction";
     const char * position = "position";
@@ -156,14 +169,16 @@ void addToJSONObject(Document &file, Document &client, string id)
     Value directionVal(kObjectType);
 
     Document::AllocatorType& allocator = file.GetAllocator();
-    
+
     // Temporary value to store temporary Object
     Value elements;
     elements.SetObject();
-
+    cout << id << endl;
     Value &clientInfo = client[id.c_str()];
+       cout << "adwada" << endl;
+
     assert(clientInfo.IsObject());
-    
+
     // Get Values from client
     if (clientInfo.HasMember(health)){
         assert(clientInfo[health].IsInt());
