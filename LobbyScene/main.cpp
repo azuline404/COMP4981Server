@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../GameScene/Server.hpp"
 #include <iostream>
 #include <stdio.h>
 #include <netdb.h>
@@ -10,14 +10,14 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "ConnectivityManager.hpp"
-#include "rapidjson/filewritestream.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/reader.h"
-#include "rapidjson/document.h"
+#include "../Networking/ConnectivityManager.hpp"
+#include "../rapidjson/filewritestream.h"
+#include "../rapidjson/filereadstream.h"
+#include "../rapidjson/document.h"
+#include "../rapidjson/writer.h"
+#include "../rapidjson/stringbuffer.h"
+#include "../rapidjson/reader.h"
+#include "../rapidjson/document.h"
 
 
 using namespace std;

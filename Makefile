@@ -3,10 +3,8 @@ LL=-lpthread
 
 all: Server Client 
 
-Client: Client.o
-	$(CC) -o Client Client.o $(LL)
 
-Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o
+Server: SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o Main.o
 	$(CC) -o  Server SelectServer.o ConnectivityManager.o LobbyManager.o Lobby.o Client.o $(LL)
 
 $(CLIB)
@@ -15,6 +13,8 @@ clean:
 	rm -f *.o core.* Server
 	rm -f *.o core.* Client
 
+Main.o:
+	$(CC) -c ./LobbyScene/main.cpp
 SelectServer.o:
 	$(CC) -c ./GameScene/SelectServer.cpp
 ConnectivityManager.o:
